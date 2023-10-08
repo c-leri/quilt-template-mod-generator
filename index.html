@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="res/favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Quilt Template Mod Generator</title>
+    <script src="/js/core/gen_prj_zip.js" type="module"></script>
+    <script src="/js/core/gen_files_content.js" type="module"></script>
+    <script src="/js/requests/get_vers.js" type="module"></script>
+    <script src="/js/generate_prj.js" type="module"></script>
+</head>
+<body>
+    <h1>Quilt Template Mod Generator</h1>
+    <div id="main">
+        <h2>Project Configuration</h2>
+        <div>
+            <label for="artifactID">Artifact ID</label>
+            <input type="text" id="artifactID" name="artifactID" placeholder="example_mod" required>
+        </div>
+        <div>
+            <label for="groupID">Group ID</label>
+            <input type="text" id="groupID" name="groupID" placeholder="me.example" required>
+        </div>
+        <div>
+            <label for="gradleVersion">Gradle Version</label>
+            <select id="gradleVersion">
+            </select>
+        </div>
+        <div>
+            <label for="useQuiltFlower">Use QuiltFlower Decompiler?</label>
+            <input type="checkbox" id="useQuiltFlower" name="useQuiltFlower">
+        </div>
+
+
+        <h2>Mod Configuration</h2>
+        <div>
+            <label for="modName">Mod name</label>
+            <input type="text" id="modName" name="modName" placeholder="modName" required>
+        </div>
+        <div>
+            <label for="modVersion">Mod version</label>
+            <input type="text" id="modVersion" name="modVersion" placeholder="modVersion" required>
+        </div>
+        <div>
+            <label for="environment">Environment</label>
+            <select id="environment">
+                <option  value="both">Both</option>
+                <option value="client">Client</option>
+                <option value="server">Server</option>
+            </select>
+        </div>
+
+        <h2>Dependencies Configuration</h2>
+        <div>
+            <label for="mcVersion">Minecraft version</label>
+            <select id="mcVersion" onchange="
+        import('/js/init_versions.js').then((module) => {
+            module.reload_q_dpendencies_list();
+        });">
+            </select>
+            <label for="mcStable">Stable?</label>
+            <input type="checkbox" id="mcStable" name="stable" checked onchange="
+        import('/js/init_versions.js').then((module) => {module.reload_mc_versions();});">
+        </div>
+        <div>
+            <label for="loaderVersion">Quilt loader version</label>
+            <select id="loaderVersion"></select>
+        </div>
+        <div>
+            <label for="quiltMapping">Quilt Mappings</label>
+            <select id="quiltMapping"></select>
+        </div>
+        <div>
+            <label for="useQSL">Use QSL & QFAPI?</label>
+            <input id="useQSL" type="checkbox" checked onchange="
+            if (document.getElementById('useQSL').checked) {
+                document.getElementById('lbQslVersion').hidden = false;
+                document.getElementById('qslVersion').hidden = false;
+                document.getElementById('lbQfapiVersion').hidden = false;
+                document.getElementById('qfapiVersion').hidden = false;
+            } else {
+                document.getElementById('lbQslVersion').hidden = true;
+                document.getElementById('qslVersion').hidden = true;
+                document.getElementById('lbQfapiVersion').hidden = true;
+                document.getElementById('qfapiVersion').hidden = true;
+            }
+        ">
+        </div>
+        <div>
+            <label for="qslVersion" id="lbQslVersion">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Quilt Standard Libraries (QSL)
+            </label>
+            <select id="qslVersion"></select>
+            <br>
+            <label for="qfapiVersion" id="lbQfapiVersion">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Quilted Fabric API (QFAPI)
+            </label>
+            <select id="qfapiVersion"></select>
+        </div>
+        <div>
+            <label for="useMixins">Use Mixins?</label>
+            <input id="useMixins" type="checkbox" checked>
+        </div>
+
+        <h2>Optional Settings</h2>
+        <details>
+            <summary></summary>
+            <div>
+                <label for="description">Description</label><br>
+                <textarea id="description" name="description" placeholder="description" rows="5" cols="60"></textarea>
+            </div>
+            <div>
+                <label for="author">Author</label>
+                <input type="text" id="author" name="author" placeholder="author">
+            </div>
+            <div>
+                <label for="homepage">Homepage</label>
+                <input type="text" id="homepage" name="homepage" placeholder="homepage">
+            </div>
+            <div>
+                <label for="sourceRepo">Source Repository</label>
+                <input  type="text" id="sourceRepo" name="source" placeholder="source">
+            </div>
+            <div>
+                <label for="issues">Issues</label>
+                <input type="text" id="issues" name="issues" placeholder="issues">
+            </div>
+        </details>
+    </div>
+    <div style="alignment-baseline: center; text-align: center">
+        <button id="gen" onclick="function gen_click() {
+                import('/js/generate_prj.js').then((module) => {
+                    module.gen_and_download_zip()
+                })
+            }
+            gen_click();
+        ">
+            Generate
+        </button>
+    </div>
+    <script>
+        function init_() {
+            import('/js/init_versions.js').then((module) => {
+                module.init_versions();
+            })
+        }
+        init_();
+    </script>
+</body>
+</html>
