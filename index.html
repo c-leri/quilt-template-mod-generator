@@ -5,10 +5,10 @@
     <link rel="icon" href="res/favicon.ico">
     <link rel="stylesheet" href="css/style.css">
     <title>Quilt Template Mod Generator</title>
-    <script src="/js/core/gen_prj_zip.js" type="module"></script>
-    <script src="/js/core/gen_files_content.js" type="module"></script>
-    <script src="/js/requests/get_vers.js" type="module"></script>
-    <script src="/js/generate_prj.js" type="module"></script>
+<!--    <script src="./js/core/gen_prj_zip.js" type="module"></script>-->
+<!--    <script src="./js/core/gen_files_content.js" type="module"></script>-->
+<!--    <script src="./js/generate_prj.js" type="module"></script>-->
+<!--    <script src="./js/init_versions.js" type="module"></script>-->
 </head>
 <body>
     <h1>Quilt Template Mod Generator</h1>
@@ -55,13 +55,15 @@
         <div>
             <label for="mcVersion">Minecraft version</label>
             <select id="mcVersion" onchange="
-        import('/js/init_versions.js').then((module) => {
-            module.reload_q_dpendencies_list();
-        });">
+                import('./js/init_versions.js').then((module) => {
+                    module.reload_q_dpendencies_list();
+                });
+            ">
             </select>
             <label for="mcStable">Stable?</label>
             <input type="checkbox" id="mcStable" name="stable" checked onchange="
-        import('/js/init_versions.js').then((module) => {module.reload_mc_versions();});">
+                import('./js/init_versions.js').then((module) => {module.reload_mc_versions();});
+            ">
         </div>
         <div>
             <label for="loaderVersion">Quilt loader version</label>
@@ -130,7 +132,7 @@
     </div>
     <div style="alignment-baseline: center; text-align: center">
         <button id="gen" onclick="function gen_click() {
-                import('/js/generate_prj.js').then((module) => {
+                import('./js/generate_prj.js').then((module) => {
                     module.gen_and_download_zip()
                 })
             }
@@ -140,12 +142,9 @@
         </button>
     </div>
     <script>
-        function init_() {
-            import('/js/init_versions.js').then((module) => {
-                module.init_versions();
-            })
-        }
-        init_();
+        import('./js/init_versions.js').then((module) => {
+            module.init_versions();
+        });
     </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 import "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
 import "https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js";
-import "/js/core/gen_files_content.js";
+
 import {
     generate_build_gradle,
     generate_gradle_properties,
@@ -10,6 +10,7 @@ import {
     generate_mixins_json,
     generate_quilt_mod_json, generate_settings_gradle
 } from "./gen_files_content.js";
+
 
 export function gen_prj_zip(
     artifact_id, group_id, gradle_ver, use_q_decompiler,

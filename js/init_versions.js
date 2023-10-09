@@ -5,7 +5,7 @@ import {
         qsl_versions,
         quilt_loader_versions,
         quilt_mapping_versions,
-    } from "./requests/get_vers.js";
+    } from "./get_version/get_vers.js";
 
 export async function init_versions() {
     // set up version selectors
