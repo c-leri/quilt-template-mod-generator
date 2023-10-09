@@ -1,7 +1,6 @@
 const GRADLE_VERSIONS = "https://services.gradle.org/versions/all";
 const QUILT_META = "https://meta.quiltmc.org/v3";
 const QUILT_RELEASE_MAVEN = "https://maven.quiltmc.org/repository/release";
-const QSL_GROUP = "org.quiltmc.qsl";
 const USER_AGENT = "Quilt Template Mod Generator | " + window.navigator.userAgent;
 
 
