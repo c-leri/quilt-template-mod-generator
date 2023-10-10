@@ -6,22 +6,31 @@ const USER_AGENT = "Quilt Template Mod Generator | " + window.navigator.userAgen
 
 
 export async function gradle_versions() {
-    let response = await fetch(GRADLE_VERSIONS, {
+    return await fetch(GRADLE_VERSIONS, {
         method: "GET",
         headers: {
-            "User-Agent": USER_AGENT
+            "User-Agent": USER_AGENT,
         }
+    }).then(async (response) => {
+        let json = await response.json();
+        let ver_list = [];
+        for (let i = 0; i < json.length; i++) {
+            ver_list.push(json[i].version);
+            if (json[i].version === "6.8.3") {
+                break;
+            }
+        }
+        return ver_list.map((ver) => {
+            return ver.toString()
+        });
+    }).catch((err) => {
+        console.log(err);
+        return ["7.2", "7.3.1", "7.3.2", "7.3.3",
+            "7.4", "7.4.1", "7.4.2", "7.5",
+            "7.5.1", "7.6", "7.6.1", "7.6.2",
+            "8.0.2", "8.1", "8.1.1", "8.2",
+            "8.2.1", "8.3", "8.4"].reverse();
     });
-    // get versions from response
-    let versions = [];
-    let json = await response.json();
-    for (let i = 0; i < json.length; i++) {
-        versions.push(json[i].version);
-        if (json[i].version === "6.8.3") {
-            break;
-        }
-    }
-    return versions;
 }
 
 
