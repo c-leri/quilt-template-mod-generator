@@ -10,6 +10,7 @@ export async function gradle_versions() {
         method: "GET",
         headers: {
             "User-Agent": USER_AGENT,
+            "Accept": "application/json",
         }
     }).then(async (response) => {
         let json = await response.json();
@@ -20,6 +21,7 @@ export async function gradle_versions() {
                 break;
             }
         }
+        // clean up cache
         return ver_list.map((ver) => {
             return ver.toString()
         });
@@ -40,8 +42,7 @@ export async function minecraft_versions(statable = true) {
         method: "GET",
         headers: {
             "User-Agent": USER_AGENT,
-            // allow different origin
-            "Cross-Origin-Opener-Policy": "unsafe-none"
+            "Accept": "application/json"
         }
     });
     let versions = [];
@@ -67,7 +68,8 @@ export async function qfapi_versions(mc_ver) {
     let response = await fetch(url, {
         method: "GET",
         headers: {
-            "User-Agent": USER_AGENT
+            "User-Agent": USER_AGENT,
+            "Accept": "application/xml"
         }
     });
     let versions = [];
@@ -90,7 +92,8 @@ export async function qsl_versions(mc_ver) {
     let response = await fetch(url, {
         method: "GET",
         headers: {
-            "User-Agent": USER_AGENT
+            "User-Agent": USER_AGENT,
+            "Accept": "application/xml"
         }
     });
     let versions = [];
@@ -113,7 +116,8 @@ export async function quilt_loader_versions() {
     let response = await fetch(url, {
         method: "GET",
         headers: {
-            "User-Agent": USER_AGENT
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json"
         }
     });
     let versions = [];
@@ -130,7 +134,8 @@ export async function quilt_mapping_versions(mc_ver) {
     let response = await fetch(url, {
         method: "GET",
         headers: {
-            "User-Agent": USER_AGENT
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json"
         }
     });
     let mappings = [];
@@ -142,10 +147,3 @@ export async function quilt_mapping_versions(mc_ver) {
     }
     return mappings;
 }
-
-// test
-// async function test() {
-//     console.log(await qfapi_versions("1.19.2"));
-// }
-//
-// test();
