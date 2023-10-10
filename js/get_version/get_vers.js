@@ -39,7 +39,9 @@ export async function minecraft_versions(statable = true) {
     let response = await fetch(url, {
         method: "GET",
         headers: {
-            "User-Agent": USER_AGENT
+            "User-Agent": USER_AGENT,
+            // allow different origin
+            "Cross-Origin-Opener-Policy": "unsafe-none"
         }
     });
     let versions = [];
