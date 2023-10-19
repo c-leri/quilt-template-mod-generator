@@ -19,7 +19,6 @@ export function gen_prj_zip(
     desc, author, homepage, source_repo, issues) {
     const zip = new JSZip();
     if (qsl_ver === "" || qfapi_ver === "") {
-        window.alert("QSL version and Quilted Fabric API version cannot be found!");
         use_qsl = false;
     }
     zip.file("gradle/wrapper/gradle-wrapper.properties",
@@ -40,7 +39,10 @@ export function gen_prj_zip(
             artifact_id,
             group_id,
             use_q_decompiler,
-            use_qsl));
+            use_qsl,
+            qsl_ver.endsWith("-SNAPSHOT") ? "-SNAPSHOT" : "",
+            qfapi_ver.endsWith("-SNAPSHOT") ? "-SNAPSHOT" : "")
+    );
     zip.file("src/main/resources/quilt.mod.json",
         generate_quilt_mod_json(
             artifact_id,

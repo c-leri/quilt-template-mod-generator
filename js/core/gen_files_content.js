@@ -1,4 +1,4 @@
-export function generate_build_gradle(artifact_id, group_id, use_decompiler, use_qsl) {
+export function generate_build_gradle(artifact_id, group_id, use_decompiler, use_qsl, qsl_snapshot= "", qfapi_snapshot = "") {
     let plugins = "plugins {\n" +
         "    id 'org.quiltmc.loom' version '1.+' // Required for the loader to work.\n";
     let dependencies = "dependencies {\n" +
@@ -22,13 +22,13 @@ export function generate_build_gradle(artifact_id, group_id, use_decompiler, use
     plugins += "}\n\n";
     if (use_qsl) {
         dependencies += "    // QSL Library\n" +
-            "    modImplementation \"org.quiltmc.qsl:core:${project.qsl_version}+${project.minecraft_version}\"\n" +
+            "    modImplementation \"org.quiltmc.qsl:core:${project.qsl_version}+${project.minecraft_version}" + qsl_snapshot + "\"\n" +
             "\n" +
             "    // QSL Module\n" +
-            "    modImplementation \"org.quiltmc.qsl.core:resource_loader:${project.qsl_version}+${project.minecraft_version}\"\n" +
+            "    modImplementation \"org.quiltmc.qsl.core:resource_loader:${project.qsl_version}+${project.minecraft_version}" + qsl_snapshot + "\"\n" +
             "\n" +
             "    // Quilted Fabric API\n" +
-            "    modImplementation \"org.quiltmc.quilted-fabric-api:quilted-fabric-api:${project.quilted_fabric_api_version}-${project.minecraft_version}\"\n";
+            "    modImplementation \"org.quiltmc.quilted-fabric-api:quilted-fabric-api:${project.quilted_fabric_api_version}-${project.minecraft_version}" + qfapi_snapshot + "\"\n";
     }
     dependencies += "}\n\n";
     return plugins + static_configs + dependencies + process_resources;
@@ -124,6 +124,10 @@ export function generate_settings_gradle() {
         "        name = 'Quilt'\n" +
         "        url = 'https://maven.quiltmc.org/repository/release'\n" +
         "    }\n" +
+        "    maven {\n" +
+        "        name = 'Quilt Snapshots'\n" +
+        "        url = 'https://maven.quiltmc.org/repository/snapshot'\n" +
+        "    }" +
         "}";
 }
 

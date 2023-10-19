@@ -1,6 +1,7 @@
 const GRADLE_VERSIONS = "https://services.gradle.org/versions/all";
 const QUILT_META = "https://meta.quiltmc.org/v3";
 const QUILT_RELEASE_MAVEN = "https://maven.quiltmc.org/repository/release";
+const QUILT_SNAPSHOT_MAVEN = "https://maven.quiltmc.org/repository/snapshot";
 const USER_AGENT = "Quilt Template Mod Generator | " + window.navigator.userAgent;
 
 
@@ -64,23 +65,28 @@ export async function minecraft_versions(statable = true) {
 
 
 export async function qfapi_versions(mc_ver) {
-    const url = QUILT_RELEASE_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml";
-    let response = await fetch(url, {
-        method: "GET",
-        headers: {
-            "User-Agent": USER_AGENT,
-            "Accept": "application/xml"
-        }
-    });
+    const urls = [QUILT_RELEASE_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml",
+                          QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml"];
+    // const url = QUILT_RELEASE_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml";
     let versions = [];
-    const xml = await response.text();
-    let parser = new DOMParser();
-    const doc = parser.parseFromString(xml, "text/xml");
-    const version_list = doc.getElementsByTagName("version");
-    for (let i = version_list.length - 1; i >= 0; i--) {
-        const ver = version_list.item(i).textContent;
-        if (ver.endsWith(mc_ver)) {
-            versions.push(ver);
+    let url;
+    for (url of urls) {
+        let response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "User-Agent": USER_AGENT,
+                "Accept": "application/xml"
+            }
+        });
+        const xml = await response.text();
+        let parser = new DOMParser();
+        const doc = parser.parseFromString(xml, "text/xml");
+        const version_list = doc.getElementsByTagName("version");
+        for (let i = version_list.length - 1; i >= 0; i--) {
+            const ver = version_list.item(i).textContent;
+            if (ver.endsWith(mc_ver) || ver.endsWith(mc_ver + "-SNAPSHOT")) {
+                versions.push(ver);
+            }
         }
     }
     return versions;
@@ -88,23 +94,28 @@ export async function qfapi_versions(mc_ver) {
 
 
 export async function qsl_versions(mc_ver) {
-    const url = QUILT_RELEASE_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml";
-    let response = await fetch(url, {
-        method: "GET",
-        headers: {
-            "User-Agent": USER_AGENT,
-            "Accept": "application/xml"
-        }
-    });
+    // const url = QUILT_RELEASE_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml";
+    const urls = [QUILT_RELEASE_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml",
+                        QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml"]
     let versions = [];
-    const xml = await response.text();
-    let parser = new DOMParser();
-    const doc = parser.parseFromString(xml, "text/xml");
-    const version_list = doc.getElementsByTagName("version");
-    for (let i = version_list.length - 1; i >= 0; i--) {
-        let ver = version_list.item(i).textContent;
-        if (ver.endsWith(mc_ver)) {
-            versions.push(ver);
+    let url;
+    for (url of urls) {
+        let response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "User-Agent": USER_AGENT,
+                "Accept": "application/xml"
+            }
+        });
+        const xml = await response.text();
+        let parser = new DOMParser();
+        const doc = parser.parseFromString(xml, "text/xml");
+        const version_list = doc.getElementsByTagName("version");
+        for (let i = version_list.length - 1; i >= 0; i--) {
+            let ver = version_list.item(i).textContent;
+            if (ver.endsWith(mc_ver) || ver.endsWith(mc_ver + "-SNAPSHOT")) {
+                versions.push(ver);
+            }
         }
     }
     return versions;
