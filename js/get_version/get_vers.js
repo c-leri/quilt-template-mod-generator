@@ -47,66 +47,104 @@ export async function minecraft_versions(stable = true) {
 }
 
 
-export async function qfapi_versions(mc_ver) {
+/**
+ * @param {string[]} mc_vers a list of minecraft versions (the first one should be the selected one) 
+ * @returns {string[]} qfapi versions for the given minecraft versions
+ */
+export async function qfapi_versions(mc_vers) {
     const urls = [
         QUILT_RELEASE_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml",
         QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml"
     ];
 
+    // get all the qfapi versions
+    let all_versions = [];
+    await Promise.all(
+        urls.map(async (url) => {
+            let response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/xml"
+                }
+            });
+
+            const xml = await response.text();
+            let parser = new DOMParser();
+            const doc = parser.parseFromString(xml, "text/xml");
+
+            Array.from(doc.getElementsByTagName("version")).map((version_element) =>
+                all_versions.push(version_element.textContent)
+            )
+        })
+    );
+
+    // get versions that match the latest minecraft version
+    // or the one before if none match
+    // or the one before that, etc
     let versions = [];
-    for (let url of urls) {
-        let response = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Accept": "application/xml"
-            }
-        });
-        const xml = await response.text();
-        let parser = new DOMParser();
-        const doc = parser.parseFromString(xml, "text/xml");
-        const version_list = doc.getElementsByTagName("version");
-        for (let i = version_list.length - 1; i >= 0; i--) {
-            const ver = version_list.item(i).textContent;
-            if (ver.endsWith(mc_ver) || ver.endsWith(mc_ver + "-SNAPSHOT")) {
-                versions.push(ver);
-            }
-        }
+    for (let i = 0; i < mc_vers.length && versions.length < 1; i++) {
+        versions = all_versions.filter((version) =>
+            version.endsWith(mc_vers[i]) || version.endsWith(mc_vers[i] + "-SNAPSHOT")
+        );
     }
-    return versions;
+
+    // sort in inverse alphabetical order
+    return versions.sort((a, b) =>
+        a.localeCompare(b) * -1
+    );
 }
 
-
-export async function qsl_versions(mc_ver) {
+/**
+ * @param {string[]} mc_vers a list of minecraft versions (the first one should be the selected one) 
+ * @returns {string[]} qsl versions for the given minecraft versions
+ */
+export async function qsl_versions(mc_vers) {
     const urls = [
         QUILT_RELEASE_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml",
         QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml"
     ]
 
+    // get all the qsl versions
+    let all_versions = [];
+    await Promise.all(
+        urls.map(async (url) => {
+            let response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/xml"
+                }
+            });
+
+            const xml = await response.text();
+            let parser = new DOMParser();
+            const doc = parser.parseFromString(xml, "text/xml");
+
+            Array.from(doc.getElementsByTagName("version")).map((version_element) =>
+                all_versions.push(version_element.textContent)
+            )
+        })
+    );
+
+    // get versions that match the latest minecraft version
+    // or the one before if none match
+    // or the one before that, etc
     let versions = [];
-    for (let url of urls) {
-        let response = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Accept": "application/xml"
-            }
-        });
-        const xml = await response.text();
-        let parser = new DOMParser();
-        const doc = parser.parseFromString(xml, "text/xml");
-        const version_list = doc.getElementsByTagName("version");
-        for (let i = version_list.length - 1; i >= 0; i--) {
-            let ver = version_list.item(i).textContent;
-            if (ver.endsWith(mc_ver) || ver.endsWith(mc_ver + "-SNAPSHOT")) {
-                versions.push(ver);
-            }
-        }
+    for (let i = 0; i < mc_vers.length && versions.length < 1; i++) {
+        versions = all_versions.filter((version) =>
+            version.endsWith(mc_vers[i]) || version.endsWith(mc_vers[i] + "-SNAPSHOT")
+        );
     }
-    return versions;
+
+    // sort in inverse alphabetical order
+    return versions.sort((a, b) =>
+        a.localeCompare(b) * -1
+    );
 }
 
 
 export async function quilt_loader_versions() {
     let url = QUILT_META + "/versions/loader";
+
     let response = await fetch(url, {
         method: "GET",
         headers: {
