@@ -2,30 +2,21 @@ const GRADLE_VERSIONS = "https://services.gradle.org/versions/all";
 const QUILT_META = "https://meta.quiltmc.org/v3";
 const QUILT_RELEASE_MAVEN = "https://maven.quiltmc.org/repository/release";
 const QUILT_SNAPSHOT_MAVEN = "https://maven.quiltmc.org/repository/snapshot";
-const USER_AGENT = "Quilt Template Mod Generator | " + window.navigator.userAgent;
-
-
 
 export async function gradle_versions() {
     return await fetch(GRADLE_VERSIONS, {
         method: "GET",
         headers: {
-            "User-Agent": USER_AGENT,
             "Accept": "application/json",
         }
     }).then(async (response) => {
         let json = await response.json();
-        let ver_list = [];
-        for (let i = 0; i < json.length; i++) {
-            ver_list.push(json[i].version);
-            if (json[i].version === "6.8.3") {
-                break;
-            }
-        }
-        // clean up cache
-        return ver_list.map((ver) => {
-            return ver.toString()
-        });
+
+        return json
+            // removes the versions that ends with their build time
+            // they can't be downloaded from https://services.gradle.org/distributions
+            .filter((gradle_version) => !gradle_version.version.endsWith(gradle_version.buildTime))
+            .map((gradle_version) => gradle_version.version);
     }).catch((err) => {
         console.log(err);
         return ["7.2", "7.3.1", "7.3.2", "7.3.3",
@@ -37,44 +28,36 @@ export async function gradle_versions() {
 }
 
 
-export async function minecraft_versions(statable = true) {
+export async function minecraft_versions(stable = true) {
     const url = QUILT_META + "/versions/game";
     let response = await fetch(url, {
         method: "GET",
         headers: {
-            "User-Agent": USER_AGENT,
             "Accept": "application/json"
         }
     });
-    let versions = [];
+
     let json = await response.json();
-    if (statable) {
-        for (let i = 0; i < json.length; i++) {
-            if (json[i].stable) {
-                versions.push(json[i].version);
-            }
-        }
+
+    if (stable) {
+        json = json.filter((minecraft_version) => minecraft_version.stable);
     }
-    else {
-        for (let i = 0; i < json.length; i++) {
-            versions.push(json[i].version);
-        }
-    }
-    return versions;
+
+    return json.map((minecraft_version) => minecraft_version.version);
 }
 
 
 export async function qfapi_versions(mc_ver) {
-    const urls = [QUILT_RELEASE_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml",
-                          QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml"];
-    // const url = QUILT_RELEASE_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml";
+    const urls = [
+        QUILT_RELEASE_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml",
+        QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml"
+    ];
+
     let versions = [];
-    let url;
-    for (url of urls) {
+    for (let url of urls) {
         let response = await fetch(url, {
             method: "GET",
             headers: {
-                "User-Agent": USER_AGENT,
                 "Accept": "application/xml"
             }
         });
@@ -94,16 +77,16 @@ export async function qfapi_versions(mc_ver) {
 
 
 export async function qsl_versions(mc_ver) {
-    // const url = QUILT_RELEASE_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml";
-    const urls = [QUILT_RELEASE_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml",
-                        QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml"]
+    const urls = [
+        QUILT_RELEASE_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml",
+        QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml"
+    ]
+
     let versions = [];
-    let url;
-    for (url of urls) {
+    for (let url of urls) {
         let response = await fetch(url, {
             method: "GET",
             headers: {
-                "User-Agent": USER_AGENT,
                 "Accept": "application/xml"
             }
         });
@@ -127,16 +110,13 @@ export async function quilt_loader_versions() {
     let response = await fetch(url, {
         method: "GET",
         headers: {
-            "User-Agent": USER_AGENT,
             "Accept": "application/json"
         }
     });
-    let versions = [];
+
     let json = await response.json();
-    for (let i = 0; i < json.length; i++) {
-        versions.push(json[i].version);
-    }
-    return versions;
+
+    return json.map((quilt_loader_version) => quilt_loader_version.version);
 }
 
 
@@ -145,16 +125,13 @@ export async function quilt_mapping_versions(mc_ver) {
     let response = await fetch(url, {
         method: "GET",
         headers: {
-            "User-Agent": USER_AGENT,
             "Accept": "application/json"
         }
     });
-    let mappings = [];
+
     let json = await response.json();
-    for (let i = 0; i < json.length; i++) {
-        if (json[i].gameVersion.toString() === mc_ver) {
-            mappings.push(json[i].version);
-        }
-    }
-    return mappings;
+
+    return json
+        .filter((quilt_mappings_version) => quilt_mappings_version.gameVersion.toString() === mc_ver)
+        .map((quilt_mapping_version) => quilt_mapping_version.version);
 }
