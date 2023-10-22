@@ -12,12 +12,14 @@
         window.onload = () => {
             init_versions();
 
-            document.getElementById("mcVersion").addEventListener("change", reload_q_dpendencies_list);
+            document.getElementById("mcVersion").addEventListener("change", () =>
+                reload_q_dpendencies_list(event.target.value)
+            );
 
-            document.getElementById("mcStable").addEventListener("change", reload_mc_versions);
+            document.getElementById("mcStable").addEventListener("change", () => reload_mc_versions(event.target.checked));
 
-            document.getElementById("useQSL").addEventListener("change", () => {
-                if (this.checked) {
+            document.getElementById("useQSL").addEventListener("change", (event) => {
+                if (event.target.checked) {
                     document.getElementById('lbQslVersion').hidden = false;
                     document.getElementById('qslVersion').hidden = false;
                     document.getElementById('lbQfapiVersion').hidden = false;
@@ -106,7 +108,7 @@
         </div>
         <div>
             <label for="useQSL">Use QSL & QFAPI?</label>
-            <input id="useQSL" type="checkbox" checked>
+            <input id="useQSL" type="checkbox" checked />
         </div>
         <div>
             <div>

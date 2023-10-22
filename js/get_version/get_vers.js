@@ -47,66 +47,88 @@ export async function minecraft_versions(stable = true) {
 }
 
 
+/**
+ * @param {string} mc_ver the selected minecraft version
+ * @returns {string[]} qfapi versions for the given minecraft versions
+ */
 export async function qfapi_versions(mc_ver) {
     const urls = [
         QUILT_RELEASE_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml",
         QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml"
     ];
 
+    // get all the qfapi versions
     let versions = [];
-    for (let url of urls) {
-        let response = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Accept": "application/xml"
-            }
-        });
-        const xml = await response.text();
-        let parser = new DOMParser();
-        const doc = parser.parseFromString(xml, "text/xml");
-        const version_list = doc.getElementsByTagName("version");
-        for (let i = version_list.length - 1; i >= 0; i--) {
-            const ver = version_list.item(i).textContent;
-            if (ver.endsWith(mc_ver) || ver.endsWith(mc_ver + "-SNAPSHOT")) {
-                versions.push(ver);
-            }
-        }
-    }
-    return versions;
+    await Promise.all(
+        urls.map(async (url) => {
+            let response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/xml"
+                }
+            });
+
+            const xml = await response.text();
+            let parser = new DOMParser();
+            const doc = parser.parseFromString(xml, "text/xml");
+
+            Array.from(doc.getElementsByTagName("version")).map((version_element) =>
+                versions.push(version_element.textContent)
+            )
+        })
+    );
+
+    return versions
+        // get only the version corresponding to the selected minecraft version
+        // excluding the "-SNAPSHOT" because they cause issues in the generated template
+        .filter((version) => version.endsWith(mc_ver))
+        // sort in inverse alphabetical order
+        .sort((a, b) => a.localeCompare(b) * -1);
 }
 
-
+/**
+ * @param {string} mc_ver the selected minecraft version
+ * @returns {string[]} qsl versions for the given minecraft versions
+ */
 export async function qsl_versions(mc_ver) {
     const urls = [
         QUILT_RELEASE_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml",
         QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml"
     ]
 
+    // get all the qsl versions
     let versions = [];
-    for (let url of urls) {
-        let response = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Accept": "application/xml"
-            }
-        });
-        const xml = await response.text();
-        let parser = new DOMParser();
-        const doc = parser.parseFromString(xml, "text/xml");
-        const version_list = doc.getElementsByTagName("version");
-        for (let i = version_list.length - 1; i >= 0; i--) {
-            let ver = version_list.item(i).textContent;
-            if (ver.endsWith(mc_ver) || ver.endsWith(mc_ver + "-SNAPSHOT")) {
-                versions.push(ver);
-            }
-        }
-    }
-    return versions;
+    await Promise.all(
+        urls.map(async (url) => {
+            let response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/xml"
+                }
+            });
+
+            const xml = await response.text();
+            let parser = new DOMParser();
+            const doc = parser.parseFromString(xml, "text/xml");
+
+            Array.from(doc.getElementsByTagName("version")).map((version_element) =>
+                versions.push(version_element.textContent)
+            )
+        })
+    );
+
+    return versions
+        // get only the version corresponding to the selected minecraft version
+        // excluding the "-SNAPSHOT" because they cause issues in the generated template
+        .filter((version) => version.endsWith(mc_ver))
+        // sort in inverse alphabetical order
+        .sort((a, b) => a.localeCompare(b) * -1);
 }
 
 
 export async function quilt_loader_versions() {
     let url = QUILT_META + "/versions/loader";
+
     let response = await fetch(url, {
         method: "GET",
         headers: {
