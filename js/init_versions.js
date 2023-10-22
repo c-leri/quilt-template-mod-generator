@@ -55,14 +55,14 @@ export async function reload_mc_versions(stable) {
             mc_ver_select.append(option);
         })
 
-        await reload_q_dpendencies_list(mc_version_list);
+        await reload_q_dpendencies_list(mc_version_list[0]);
     });
 }
 
 /**
- * @param {string[]} mc_vers a list of minecraft versions (the first one should be the selected one) 
+ * @param {string} mc_ver the currently selected minecraft version
  */
-export async function reload_q_dpendencies_list(mc_vers) {
+export async function reload_q_dpendencies_list(mc_ver) {
     let q_mapping_ver_select = document.getElementById("quiltMapping");
     let qsl_ver_select = document.getElementById("qslVersion");
     let qfapi_ver_select = document.getElementById("qfapiVersion");
@@ -72,8 +72,8 @@ export async function reload_q_dpendencies_list(mc_vers) {
     qfapi_ver_select.innerHTML = "";
 
     // asynchonously get and display quilt mapping versions
-    // using the latest minecraft version
-    quilt_mapping_versions(mc_vers[0]).then((q_mapping_version_list) =>
+    // using the selected minecraft version
+    quilt_mapping_versions(mc_ver).then((q_mapping_version_list) =>
         q_mapping_version_list.forEach((ver) => {
             let option = document.createElement("option");
             option.value = ver;
@@ -83,8 +83,8 @@ export async function reload_q_dpendencies_list(mc_vers) {
     );
 
     // asynchonously get and display qsl versions
-    // using the latest minecraft version
-    qsl_versions(mc_vers).then((qsl_version_list) =>
+    // using the selected minecraft version
+    qsl_versions(mc_ver).then((qsl_version_list) =>
         qsl_version_list.forEach((ver) => {
             let option = document.createElement("option");
             option.value = ver;
@@ -94,8 +94,8 @@ export async function reload_q_dpendencies_list(mc_vers) {
     );
 
     // asynchonously get and display quilted fabric api versions
-    // using the latest minecraft version
-    qfapi_versions(mc_vers).then((qfapi_version_list) =>
+    // using the selected minecraft version
+    qfapi_versions(mc_ver).then((qfapi_version_list) =>
         qfapi_version_list.forEach((ver) => {
             let option = document.createElement("option");
             option.value = ver;

@@ -48,17 +48,17 @@ export async function minecraft_versions(stable = true) {
 
 
 /**
- * @param {string[]} mc_vers a list of minecraft versions (the first one should be the selected one) 
+ * @param {string} mc_ver the selected minecraft version
  * @returns {string[]} qfapi versions for the given minecraft versions
  */
-export async function qfapi_versions(mc_vers) {
+export async function qfapi_versions(mc_ver) {
     const urls = [
         QUILT_RELEASE_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml",
         QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml"
     ];
 
     // get all the qfapi versions
-    let all_versions = [];
+    let versions = [];
     await Promise.all(
         urls.map(async (url) => {
             let response = await fetch(url, {
@@ -73,39 +73,31 @@ export async function qfapi_versions(mc_vers) {
             const doc = parser.parseFromString(xml, "text/xml");
 
             Array.from(doc.getElementsByTagName("version")).map((version_element) =>
-                all_versions.push(version_element.textContent)
+                versions.push(version_element.textContent)
             )
         })
     );
 
-    // get versions that match the latest minecraft version
-    // or the one before if none match
-    // or the one before that, etc
-    let versions = [];
-    for (let i = 0; i < mc_vers.length && versions.length < 1; i++) {
-        versions = all_versions.filter((version) =>
-            version.endsWith(mc_vers[i]) || version.endsWith(mc_vers[i] + "-SNAPSHOT")
-        );
-    }
-
-    // sort in inverse alphabetical order
-    return versions.sort((a, b) =>
-        a.localeCompare(b) * -1
-    );
+    return versions
+        // get only the version corresponding to the selected minecraft version
+        // excluding the "-SNAPSHOT" because they cause issues in the generated template
+        .filter((version) => version.endsWith(mc_ver))
+        // sort in inverse alphabetical order
+        .sort((a, b) => a.localeCompare(b) * -1);
 }
 
 /**
- * @param {string[]} mc_vers a list of minecraft versions (the first one should be the selected one) 
+ * @param {string} mc_ver the selected minecraft version
  * @returns {string[]} qsl versions for the given minecraft versions
  */
-export async function qsl_versions(mc_vers) {
+export async function qsl_versions(mc_ver) {
     const urls = [
         QUILT_RELEASE_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml",
         QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml"
     ]
 
     // get all the qsl versions
-    let all_versions = [];
+    let versions = [];
     await Promise.all(
         urls.map(async (url) => {
             let response = await fetch(url, {
@@ -120,25 +112,17 @@ export async function qsl_versions(mc_vers) {
             const doc = parser.parseFromString(xml, "text/xml");
 
             Array.from(doc.getElementsByTagName("version")).map((version_element) =>
-                all_versions.push(version_element.textContent)
+                versions.push(version_element.textContent)
             )
         })
     );
 
-    // get versions that match the latest minecraft version
-    // or the one before if none match
-    // or the one before that, etc
-    let versions = [];
-    for (let i = 0; i < mc_vers.length && versions.length < 1; i++) {
-        versions = all_versions.filter((version) =>
-            version.endsWith(mc_vers[i]) || version.endsWith(mc_vers[i] + "-SNAPSHOT")
-        );
-    }
-
-    // sort in inverse alphabetical order
-    return versions.sort((a, b) =>
-        a.localeCompare(b) * -1
-    );
+    return versions
+        // get only the version corresponding to the selected minecraft version
+        // excluding the "-SNAPSHOT" because they cause issues in the generated template
+        .filter((version) => version.endsWith(mc_ver))
+        // sort in inverse alphabetical order
+        .sort((a, b) => a.localeCompare(b) * -1);
 }
 
 

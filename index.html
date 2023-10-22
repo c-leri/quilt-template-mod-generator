@@ -13,11 +13,7 @@
             init_versions();
 
             document.getElementById("mcVersion").addEventListener("change", () =>
-                reload_q_dpendencies_list(
-                    Array.from(event.target.options)
-                        .map((version_element) => version_element.textContent)
-                        .filter((version) => version <= event.target.value)
-                )
+                reload_q_dpendencies_list(event.target.value)
             );
 
             document.getElementById("mcStable").addEventListener("change", () => reload_mc_versions(event.target.checked));
