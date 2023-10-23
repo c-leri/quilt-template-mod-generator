@@ -80,8 +80,7 @@ export async function qfapi_versions(mc_ver) {
 
     return versions
         // get only the version corresponding to the selected minecraft version
-        // excluding the "-SNAPSHOT" because they cause issues in the generated template
-        .filter((version) => version.endsWith(mc_ver))
+        .filter((version) => version.endsWith(mc_ver) || version.endsWith(mc_ver + "-SNAPSHOT"))
         // sort in inverse alphabetical order
         .sort((a, b) => a.localeCompare(b) * -1);
 }
@@ -120,7 +119,7 @@ export async function qsl_versions(mc_ver) {
     return versions
         // get only the version corresponding to the selected minecraft version
         // excluding the "-SNAPSHOT" because they cause issues in the generated template
-        .filter((version) => version.endsWith(mc_ver))
+        .filter((version) => version.endsWith(mc_ver) || version.endsWith(mc_ver + "-SNAPSHOT"))
         // sort in inverse alphabetical order
         .sort((a, b) => a.localeCompare(b) * -1);
 }

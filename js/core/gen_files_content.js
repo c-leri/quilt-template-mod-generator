@@ -47,10 +47,10 @@ export function generate_gradle_properties(mc_ver, qm_ver, loader_ver, mod_ver, 
     "\n" +
     "# Dependencies\n" +
     "    # QSL version number is shared between all the modules.\n" +
-    "    qsl_version=" + qsl_ver + "\n" +
+    "    qsl_version=" + qsl_ver.replaceAll("-SNAPSHOT", "") + "\n" +
     "\n" +
     "    # Quilted Fabric API\n" +
-    "    quilted_fabric_api_version = " + qfapi_ver;
+    "    quilted_fabric_api_version = " + qfapi_ver.replaceAll("-SNAPSHOT", "") + "\n";
 }
 
 export function generate_gradle_wrapper(gradle_ver) {
