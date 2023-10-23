@@ -18,20 +18,6 @@
 
             document.getElementById("mcStable").addEventListener("change", () => reload_mc_versions(event.target.checked));
 
-            document.getElementById("useQSL").addEventListener("change", (event) => {
-                if (event.target.checked) {
-                    document.getElementById('lbQslVersion').hidden = false;
-                    document.getElementById('qslVersion').hidden = false;
-                    document.getElementById('lbQfapiVersion').hidden = false;
-                    document.getElementById('qfapiVersion').hidden = false;
-                } else {
-                    document.getElementById('lbQslVersion').hidden = true;
-                    document.getElementById('qslVersion').hidden = true;
-                    document.getElementById('lbQfapiVersion').hidden = true;
-                    document.getElementById('qfapiVersion').hidden = true;
-                }
-            });
-
             document.getElementById("gen").addEventListener("click", gen_and_download_zip);
         }
     </script>
@@ -66,11 +52,6 @@
             <select id="gradleVersion">
             </select>
         </div>
-        <div>
-            <label for="useQuiltFlower">Use QuiltFlower Decompiler?</label>
-            <input type="checkbox" id="useQuiltFlower" name="useQuiltFlower">
-        </div>
-
 
         <h2>Mod Configuration</h2>
         <div>
@@ -107,27 +88,12 @@
             <select id="quiltMapping"></select>
         </div>
         <div>
-            <label for="useQSL">Use QSL & QFAPI?</label>
-            <input id="useQSL" type="checkbox" checked />
-        </div>
-        <div>
-            <div>
-                <label for="qslVersion" id="lbQslVersion">
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Quilt Standard Libraries
-                    (QSL)
-                </label>
-                <select id="qslVersion"></select>
-            </div>
-            <div>
-                <label for="qfapiVersion" id="lbQfapiVersion">
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Quilted Fabric API (QFAPI)
-                </label>
-                <select id="qfapiVersion"></select>
-            </div>
+            <label for="qfapiVersion" id="lbQfapiVersion">Quilted Fabric API (QFAPI)</label>
+            <select id="qfapiVersion"></select>
         </div>
         <div>
             <label for="useMixins">Use Mixins?</label>
-            <input id="useMixins" type="checkbox" checked>
+            <input id="useMixins" type="checkbox" checked />
         </div>
 
         <h2>Optional Settings</h2>
@@ -139,19 +105,19 @@
             </div>
             <div>
                 <label for="author">Author</label>
-                <input type="text" id="author" name="author" placeholder="author">
+                <input type="text" id="author" name="author" placeholder="author" />
             </div>
             <div>
                 <label for="homepage">Homepage</label>
-                <input type="text" id="homepage" name="homepage" placeholder="homepage">
+                <input type="text" id="homepage" name="homepage" placeholder="homepage" />
             </div>
             <div>
                 <label for="sourceRepo">Source Repository</label>
-                <input type="text" id="sourceRepo" name="source" placeholder="source">
+                <input type="text" id="sourceRepo" name="source" placeholder="source" />
             </div>
             <div>
                 <label for="issues">Issues</label>
-                <input type="text" id="issues" name="issues" placeholder="issues">
+                <input type="text" id="issues" name="issues" placeholder="issues" />
             </div>
         </details>
     </div>

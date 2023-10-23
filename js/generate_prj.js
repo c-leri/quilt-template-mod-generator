@@ -7,7 +7,6 @@ export async function gen_and_download_zip() {
     const artifact_id = document.getElementById("artifactID").value;
     const group_id = document.getElementById("groupID").value;
     const gradle_ver = document.getElementById("gradleVersion").value;
-    const use_q_decompiler = document.getElementById("useQuiltFlower").checked;
 
     // mod config
     const mod_name = document.getElementById("modName").value;
@@ -17,10 +16,8 @@ export async function gen_and_download_zip() {
     // dependency config
     const mc_ver = document.getElementById("mcVersion").value;
     const loader_ver = document.getElementById("loaderVersion").value;
-    const q_mapping_ver = document.getElementById("quiltMapping").value.toString().split("+build.")[1]
-    const qsl_ver = document.getElementById("qslVersion").value.toString().replace("+" + mc_ver, "");
-    const qfapi_ver = document.getElementById("qfapiVersion").value.toString().replace("-" + mc_ver, "");
-    const use_qsl = document.getElementById("useQSL").checked;
+    const q_mapping_ver = document.getElementById("quiltMapping").value.toString();
+    const qfapi_ver = document.getElementById("qfapiVersion").value.toString();
     const use_mixins = document.getElementById("useMixins").checked;
 
     // optional config
@@ -44,16 +41,18 @@ export async function gen_and_download_zip() {
         return;
     }
 
-    if (qsl_ver === "" || qfapi_ver === "") {
-        window.alert("QSL or Quilted Fabric API for Minecraft version " + mc_ver + " cannot be found!\n" +
-        "The project will be generated without QSL and Quilted Fabric API configuration.");
+    if (qfapi_ver === "") {
+        window.alert("Quilted Fabric API for Minecraft version " + mc_ver + " cannot be found!\n" +
+        "Please choose a Minecraft version with for which a Quilt Fabric API version exists");
+        return;
     }
 
     let zip = gen_prj_zip(
-        artifact_id, group_id, gradle_ver, use_q_decompiler,
+        artifact_id, group_id, gradle_ver,
         mod_name, mod_ver, env,
-        mc_ver, loader_ver, q_mapping_ver, qsl_ver, qfapi_ver, use_qsl, use_mixins,
-        desc, author, homepage, source_repo, issues);
+        mc_ver, loader_ver, q_mapping_ver, qfapi_ver, use_mixins,
+        desc, author, homepage, source_repo, issues
+    );
 
     zip.generateAsync({type: "blob"}).then(
         function (ctx_) {
