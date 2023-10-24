@@ -9,7 +9,8 @@ import {
     generate_java_client,
     generate_java_mixin,
     generate_quilt_mod_json,
-    generate_mixins_json
+    generate_mixins_json,
+    generate_build_gradle
 } from "./gen_files_content.js";
 
 /**
@@ -70,11 +71,11 @@ export function gen_prj_zip(
     add_static_file_to_folder(zip, ".editorconfig");
     add_static_file_to_folder(zip, ".gitattributes")
     add_static_file_to_folder(zip, ".gitignore");
-    add_static_file_to_folder(zip, "build.gradle");
     add_static_file_to_folder(zip, "gradlew");
     add_static_file_to_folder(zip, "gradlew.bat");
     add_static_file_to_folder(zip, "settings.gradle");
 
+    zip.file("build.gradle", generate_build_gradle(archive_name));
     zip.file("gradle.properties", generate_gradle_properties(mod_version, group_id, archive_name));
 
     const gradle_folder = zip.folder("gradle");
