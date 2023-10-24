@@ -4,109 +4,109 @@
  */
 export function generate_build_gradle(mod_id) {
     return `plugins {
-    id 'maven-publish'
-    alias libs.plugins.quilt.loom
+\tid 'maven-publish'
+\talias libs.plugins.quilt.loom
 }
 
 base {
-    archivesName = project.archives_base_name
+\tarchivesName = project.archives_base_name
 }
 
 version = "$project.version+\${libs.versions.minecraft.get()}"
 group = project.maven_group
 
 repositories {
-    // Add repositories to retrieve artifacts from in here.
-    // You should only use this when depending on other mods because
-    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
-    // for more information about repositories.
+\t// Add repositories to retrieve artifacts from in here.
+\t// You should only use this when depending on other mods because
+\t// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+\t// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+\t// for more information about repositories.
 }
 
 loom {
-    // Loom and Loader both use this block in order to gather more information about your mod.
-    mods {
-        // This should match your mod id.
-        "${mod_id}" {
-            // Tell Loom about each source set used by your mod here. This ensures that your mod's classes are properly transformed by Loader.
-            sourceSet("main")
-            // If you shade (directly include classes, not JiJ) a dependency into your mod, include it here using one of these methods:
-            // dependency("com.example.shadowedmod:1.2.3")
-            // configuration("exampleShadedConfigurationName")
-        }
-    }
+\t// Loom and Loader both use this block in order to gather more information about your mod.
+\tmods {
+\t\t// This should match your mod id.
+\t\t"${mod_id}" {
+\t\t\t// Tell Loom about each source set used by your mod here. This ensures that your mod's classes are properly transformed by Loader.
+\t\t\tsourceSet("main")
+\t\t\t// If you shade (directly include classes, not JiJ) a dependency into your mod, include it here using one of these methods:
+\t\t\t// dependency("com.example.shadowedmod:1.2.3")
+\t\t\t// configuration("exampleShadedConfigurationName")
+\t\t}
+\t}
 }
 
 // All the dependencies are declared at gradle/libs.version.toml and referenced with "libs.<id>"
 // See https://docs.gradle.org/current/userguide/platforms.html for information on how version catalogs work.
 dependencies {
-    minecraft libs.minecraft
-    mappings variantOf(libs.quilt.mappings) { classifier 'intermediary-v2' }
-    // Replace the above line with the block below if you want to use Mojang mappings as your primary mappings, falling back on QM for parameters and Javadocs
-    /*
-    mappings loom.layered {
-        mappings "org.quiltmc:quilt-mappings:\${libs.versions.quilt.mappings.get()}:intermediary-v2"
-        officialMojangMappings()
-    }
-    */
-    modImplementation libs.quilt.loader
+\tminecraft libs.minecraft
+\tmappings variantOf(libs.quilt.mappings) { classifier 'intermediary-v2' }
+\t// Replace the above line with the block below if you want to use Mojang mappings as your primary mappings, falling back on QM for parameters and Javadocs
+\t/*
+\tmappings loom.layered {
+\t\tmappings "org.quiltmc:quilt-mappings:\${libs.versions.quilt.mappings.get()}:intermediary-v2"
+\t\tofficialMojangMappings()
+\t}
+\t*/
+\tmodImplementation libs.quilt.loader
 
-    // QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
-    // Quilted Fabric API will automatically pull in the correct QSL version.
-    modImplementation libs.quilted.fabric.api
-    // modImplementation libs.bundles.quilted.fabric.api // If you wish to use Fabric API's deprecated modules, you can replace the above line with this one
+\t// QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
+\t// Quilted Fabric API will automatically pull in the correct QSL version.
+\tmodImplementation libs.quilted.fabric.api
+\t// modImplementation libs.bundles.quilted.fabric.api // If you wish to use Fabric API's deprecated modules, you can replace the above line with this one
 }
 
 processResources {
-    inputs.property 'version', version
+\tinputs.property 'version', version
 
-    filesMatching('quilt.mod.json') {
-        expand 'version': version
-    }
+\tfilesMatching('quilt.mod.json') {
+\t\texpand 'version': version
+\t}
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.encoding = 'UTF-8'
-    // Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-    it.options.release = 17
+\tit.options.encoding = 'UTF-8'
+\t// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
+\tit.options.release = 17
 }
 
 java {
-    // Still required by IDEs such as Eclipse and Visual Studio Code
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+\t// Still required by IDEs such as Eclipse and Visual Studio Code
+\tsourceCompatibility = JavaVersion.VERSION_17
+\ttargetCompatibility = JavaVersion.VERSION_17
 
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task if it is present.
-    // If you remove this line, sources will not be generated.
-    withSourcesJar()
+\t// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task if it is present.
+\t// If you remove this line, sources will not be generated.
+\twithSourcesJar()
 
-    // If this mod is going to be a library, then it should also generate Javadocs in order to aid with development.
-    // Uncomment this line to generate them.
-    // withJavadocJar()
+\t// If this mod is going to be a library, then it should also generate Javadocs in order to aid with development.
+\t// Uncomment this line to generate them.
+\t// withJavadocJar()
 }
 
 // If you plan to use a different file for the license, don't forget to change the file name here!
 jar {
-    from('LICENSE') {
-        rename { "\${it}_\${base.archivesName.get()}" }
-    }
+\tfrom('LICENSE') {
+\t\trename { "\${it}_\${base.archivesName.get()}" }
+\t}
 }
 
 // Configure the maven publication
 publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
+\tpublications {
+\t\tmavenJava(MavenPublication) {
+\t\t\tfrom components.java
+\t\t}
+\t}
 
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
-        // Notice: This block does NOT have the same function as the block in the top level.
-        // The repositories here will be used for publishing your artifact, not for
-        // retrieving dependencies.
-    }
+\t// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+\trepositories {
+\t\t// Add repositories to publish to here.
+\t\t// Notice: This block does NOT have the same function as the block in the top level.
+\t\t// The repositories here will be used for publishing your artifact, not for
+\t\t// retrieving dependencies.
+\t}
 }
 `;
 }
@@ -207,15 +207,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ${mod_name.replaceAll(" ", "")} implements ModInitializer {
-    // This logger is used to write text to the console and the log file.
-    // It is considered best practice to use your mod name as the logger's name.
-    // That way, it's clear which mod wrote info, warnings, and errors.
-    public static final Logger LOGGER = LoggerFactory.getLogger("${mod_name}");
+\t// This logger is used to write text to the console and the log file.
+\t// It is considered best practice to use your mod name as the logger's name.
+\t// That way, it's clear which mod wrote info, warnings, and errors.
+\tpublic static final Logger LOGGER = LoggerFactory.getLogger("${mod_name}");
 
-    @Override
-    public void onInitialize(ModContainer mod) {
-        LOGGER.info("Hello Quilt world from {}!", mod.metadata().name());
-    }
+\t@Override
+\tpublic void onInitialize(ModContainer mod) {
+\t\tLOGGER.info("Hello Quilt world from {}!", mod.metadata().name());
+\t}
 }
 `;
 }
@@ -242,15 +242,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ${mod_name.replaceAll(" ", "")}Client implements ClientModInitializer {
-    // This logger is used to write text to the console and the log file.
-    // It is considered best practice to use your mod name as the logger's name.
-    // That way, it's clear which mod wrote info, warnings, and errors.
-    public static final Logger LOGGER = LoggerFactory.getLogger("${mod_name}");
+\t// This logger is used to write text to the console and the log file.
+\t// It is considered best practice to use your mod name as the logger's name.
+\t// That way, it's clear which mod wrote info, warnings, and errors.
+\tpublic static final Logger LOGGER = LoggerFactory.getLogger("${mod_name}");
 
-    @Override
-    public void onInitializeClient(ModContainer mod) {
-        LOGGER.info("Hello Quilt world from {}!", mod.metadata().name());
-    }
+\t@Override
+\tpublic void onInitializeClient(ModContainer mod) {
+\t\tLOGGER.info("Hello Quilt world from {}!", mod.metadata().name());
+\t}
 }
 `
     } else return `package ${group_id}.${mod_id}.client;
@@ -259,8 +259,8 @@ import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;
 
 public class ${mod_name.replaceAll(" ", "")}Client implements ClientModInitializer {
-    @Override
-    public void onInitializeClient(ModContainer mod) {}
+\t@Override
+\tpublic void onInitializeClient(ModContainer mod) {}
 }
 `;
 }
@@ -289,10 +289,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TitleScreen.class)
 public class TitleScreenMixin {
-    @Inject(method = "init", at = @At("TAIL"))
-    public void onInit(CallbackInfo ci) {
-        ${env === "client" ? mod_name.replaceAll(" ", "") + "Client" : mod_name.replaceAll(" ", "")}.LOGGER.info("This line is printed by an example mod mixin!");
-    }
+\t@Inject(method = "init", at = @At("TAIL"))
+\tpublic void onInit(CallbackInfo ci) {
+\t\t${env === "client" ? mod_name.replaceAll(" ", "") + "Client" : mod_name.replaceAll(" ", "")}.LOGGER.info("This line is printed by a mixin of ${mod_name}!");
+\t}
 }
 `;
 }
@@ -328,63 +328,62 @@ export function generate_quilt_mod_json(
     minecraft_version,
     use_mixins
 ) {
-    let entrypoints = '"entrypoints": {\n';
+    let entrypoints = '\n\t\t"entrypoints": {\n';
     switch (env) {
         case "client":
-            entrypoints += `            "client_init": "${group_id}.${mod_id}.client.${mod_name.replaceAll(" ", "")}Client"\n`;
+            entrypoints += `\t\t\t"client_init": "${group_id}.${mod_id}.client.${mod_name.replaceAll(" ", "")}Client"\n`;
             break
         case "both":
-            entrypoints += `            "init": "${group_id}.${mod_id}.${mod_name.replaceAll(" ", "")}",
-            "client_init": "${group_id}.${mod_id}.client.${mod_name.replaceAll(" ", "")}Client"\n`;
+            entrypoints += `\t\t\t"init": "${group_id}.${mod_id}.${mod_name.replaceAll(" ", "")}",
+\t\t\t"client_init": "${group_id}.${mod_id}.client.${mod_name.replaceAll(" ", "")}Client"\n`;
             break;
         case "server":
-            entrypoints += `            "init": "${group_id}.${mod_id}.${mod_name.replaceAll(" ", "")}"\n`;
+            entrypoints += `\t\t\t"init": "${group_id}.${mod_id}.${mod_name.replaceAll(" ", "")}"\n`;
             break;
     }
-    entrypoints += '        },';
+    entrypoints += '\t\t},';
 
     let mixin = "";
     if (use_mixins) {
-        mixin = `,\n"mixin": "${mod_id}.mixins.json"`
+        mixin = `,\n\t"mixin": "${mod_id}.mixins.json"`
     }
 
     return `{
-    "schema_version": 1,
-    "quilt_loader": {
-        "group": "${group_id}",
-        "id": "${mod_id}",
-        "version": "\${version}",
-        "metadata": {
-            "name": "${mod_name}",
-            "description": "${description}",
-            "contributors": {
-                "${author}": "Owner"
-            },
-            "contact": {
-                "homepage": "${homepage}",
-                "issues": "${issues}",
-                "sources": "${sources}"
-            },
-            "icon": "assets/${mod_id}/icon.png"
-        },
-        "intermediate_mappings": "net.fabricmc:intermediary",
-        ${entrypoints}
-        "depends": [
-            {
-                "id": "quilt_loader",
-                "versions": ">=${quilt_loader_version}"
-            },
-            {
-                "id": "quilted_fabric_api",
-                "versions": ">=${quilted_fabric_api_version}"
-            },
-            {
-                "id": "minecraft",
-                "versions": "~${minecraft_version}"
-            }
-        ]
-    }${mixin}
-}    
+\t"schema_version": 1,
+\t"quilt_loader": {
+\t\t"group": "${group_id}",
+\t\t"id": "${mod_id}",
+\t\t"version": "\${version}",
+\t\t"metadata": {
+\t\t\t"name": "${mod_name}",
+\t\t\t"description": "${description}",
+\t\t\t"contributors": {
+\t\t\t\t"${author}": "Owner"
+\t\t\t},
+\t\t\t"contact": {
+\t\t\t\t"homepage": "${homepage}",
+\t\t\t\t"issues": "${issues}",
+\t\t\t\t"sources": "${sources}"
+\t\t\t},
+\t\t\t"icon": "assets/${mod_id}/icon.png"
+\t\t},
+\t\t"intermediate_mappings": "net.fabricmc:intermediary",${entrypoints}
+\t\t"depends": [
+\t\t\t{
+\t\t\t\t"id": "quilt_loader",
+\t\t\t\t"versions": ">=${quilt_loader_version.replace(/-.+/, "-")}"
+\t\t\t},
+\t\t\t{
+\t\t\t\t"id": "quilted_fabric_api",
+\t\t\t\t"versions": ">=${quilted_fabric_api_version.replace(/-.+/, "-")}"
+\t\t\t},
+\t\t\t{
+\t\t\t\t"id": "minecraft",
+\t\t\t\t"versions": "~${minecraft_version}"
+\t\t\t}
+\t\t]
+\t}${mixin}
+}
 `;
 }
 
@@ -395,17 +394,34 @@ export function generate_quilt_mod_json(
  */
 export function generate_mixins_json(mod_id, group_id) {
     return `{
-    "required": true,
-    "minVersion": "0.8",
-    "package": "${group_id}.${mod_id}.mixin",
-    "compatibilityLevel": "JAVA_17",
-    "mixins": [],
-    "client": [
-        "TitleScreenMixin"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+  "required": true,
+  "minVersion": "0.8",
+  "package": "${group_id}.${mod_id}.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [],
+  "client": [
+    "TitleScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }    
+`;
+}
+
+/**
+ * @param {string} author 
+ * @returns {string} the content of the MIT License
+ */
+export function generate_mit_license(author) {
+    return `MIT License
+
+Copyright (c) ${new Date().getFullYear()} ${author ? author : "<copyright holders>"}
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice (including the next paragraph) shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 `;
 }

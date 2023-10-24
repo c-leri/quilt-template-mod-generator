@@ -21,6 +21,7 @@ export async function gen_and_download_zip() {
     const use_mixins = document.getElementById("useMixins").checked;
 
     // optional config
+    const license = document.getElementById("license").value;
     const desc = document.getElementById("description").value.toString().replaceAll("\n", "\\n");
     const author = document.getElementById("author").value;
     const homepage = document.getElementById("homepage").value;
@@ -51,7 +52,7 @@ export async function gen_and_download_zip() {
         artifact_id, group_id, gradle_ver,
         mod_name, mod_ver, env,
         mc_ver, loader_ver, q_mapping_ver, qfapi_ver, use_mixins,
-        desc, author, homepage, source_repo, issues
+        license, desc, author, homepage, source_repo, issues
     );
 
     zip.generateAsync({type: "blob"}).then(

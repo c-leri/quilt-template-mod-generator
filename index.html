@@ -76,7 +76,7 @@
             <label for="mcVersion">Minecraft version</label>
             <select id="mcVersion">
             </select>
-            <label for="mcStable">Stable?</label>
+            <label id="mcStableLabel" for="mcStable">Stable?</label>
             <input type="checkbox" id="mcStable" name="stable" checked>
         </div>
         <div>
@@ -96,12 +96,25 @@
             <input id="useMixins" type="checkbox" checked />
         </div>
 
-        <h2>Optional Settings</h2>
-        <details>
-            <summary></summary>
+        <details id="optional_settings">
+            <summary>
+                <h2>Optional Settings</h2>
+            </summary>
             <div>
-                <label for="description">Description</label><br>
-                <textarea id="description" name="description" placeholder="description" rows="5" cols="60"></textarea>
+                <label for="license">License</label>
+                <select id="license">
+                    <option>No License</option>
+                    <option>The Unlicense</option>
+                    <option>Creative Commons Zero</option>
+                    <option>GNU Lesser General Public License v3.0</option>
+                    <option>MIT License</option>
+                    <option>Apache License 2.0</option>
+                </select>
+                <p class="details">For more information see <a href="https://blog.modrinth.com/p/licensing-guide">https://blog.modrinth.com/p/licensing-guide</a></p>
+            </div>
+            <div>
+                <label for="description">Description</label>
+                <textarea id="description" name="description" placeholder="description" rows="5"></textarea>
             </div>
             <div>
                 <label for="author">Author</label>
@@ -121,7 +134,7 @@
             </div>
         </details>
     </div>
-    <div style="alignment-baseline: center; text-align: center">
+    <div style="text-align: center">
         <button id="gen">
             Generate
         </button>

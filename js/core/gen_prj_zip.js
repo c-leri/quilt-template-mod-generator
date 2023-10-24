@@ -10,7 +10,8 @@ import {
     generate_java_mixin,
     generate_quilt_mod_json,
     generate_mixins_json,
-    generate_build_gradle
+    generate_build_gradle,
+    generate_mit_license
 } from "./gen_files_content.js";
 
 /**
@@ -30,6 +31,45 @@ function add_static_file_to_folder(folder, fileName) {
 }
 
 /**
+ * @param {string} fileName 
+ * @returns {string} the license file's content
+ */
+async function get_license_file_content(fileName) {
+    return (await fetch("res/static/licenses/" + fileName, { headers: { "Accept": "text/plain" } })).text();
+}
+
+/**
+ * @param {JSZip} folder the folder to add the file to
+ * @param {string} license the name of the license to add
+ * @param {string} author the name of the mod's author
+ */
+function add_license_file_to_folder(folder, license, author) {
+    let license_content = "";
+
+    switch (license) {
+        case "The Unlicense":
+            license_content = get_license_file_content("Unlicense.txt");
+            break;
+        case "Creative Commons Zero":
+            license_content = get_license_file_content("CC0-1.0.txt");
+            break;
+        case "GNU Lesser General Public License v3.0":
+            license_content = get_license_file_content("LGPL-3.0-only.txt");
+            break;
+        case "MIT License":
+            license_content = generate_mit_license(author);
+            break;
+        case "Apache License 2.0":
+            license_content = get_license_file_content("Apache-2.0.txt");
+            break;
+    }
+
+    if (license_content) {
+        folder.file("LICENSE", license_content);
+    }
+}
+
+/**
  * @param {string} archive_name 
  * @param {string} group_id 
  * @param {string} gradle_version 
@@ -41,6 +81,7 @@ function add_static_file_to_folder(folder, fileName) {
  * @param {string} quilt_mappings_version 
  * @param {string} quilted_fabric_api_version 
  * @param {boolean} use_mixins 
+ * @param {string} license 
  * @param {string} description 
  * @param {string} author 
  * @param {string} homepage 
@@ -60,6 +101,7 @@ export function gen_prj_zip(
     quilt_mappings_version,
     quilted_fabric_api_version,
     use_mixins,
+    license,
     description,
     author,
     homepage,
@@ -74,6 +116,8 @@ export function gen_prj_zip(
     add_static_file_to_folder(zip, "gradlew");
     add_static_file_to_folder(zip, "gradlew.bat");
     add_static_file_to_folder(zip, "settings.gradle");
+
+    add_license_file_to_folder(zip, license, author);
 
     zip.file("build.gradle", generate_build_gradle(archive_name));
     zip.file("gradle.properties", generate_gradle_properties(mod_version, group_id, archive_name));
