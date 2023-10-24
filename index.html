@@ -9,14 +9,23 @@
         import { init_versions, reload_mc_versions, reload_q_dpendencies_list } from './js/init_versions.js';
         import { gen_and_download_zip } from './js/generate_prj.js';
 
+        function displayQFAPIVersionSelector(useQfapi) {
+            document.getElementById("qfapiVersion").hidden = !useQfapi;
+            document.getElementById("lbQfapiVersion").hidden = !useQfapi;
+        }
+
         window.onload = () => {
             init_versions();
+
+            displayQFAPIVersionSelector(document.getElementById("useQfapi").checked);
 
             document.getElementById("mcVersion").addEventListener("change", () =>
                 reload_q_dpendencies_list(event.target.value)
             );
 
             document.getElementById("mcStable").addEventListener("change", () => reload_mc_versions(event.target.checked));
+
+            document.getElementById("useQfapi").addEventListener("change", () => displayQFAPIVersionSelector(event.target.checked));
 
             document.getElementById("gen").addEventListener("click", gen_and_download_zip);
         }
@@ -36,104 +45,101 @@
             <label class="inNav">Issues</label>
         </a>
     </nav>
+
     <h1>Quilt Template Mod Generator</h1>
-    <div id="main">
+
+    <main>
         <h2>Project Configuration</h2>
-        <div>
-            <label for="artifactID">Artifact ID</label>
-            <input type="text" id="artifactID" name="artifactID" placeholder="example_mod" required>
-        </div>
-        <div>
-            <label for="groupID">Group ID</label>
-            <input type="text" id="groupID" name="groupID" placeholder="me.example" required>
-        </div>
-        <div>
-            <label for="gradleVersion">Gradle Version</label>
-            <select id="gradleVersion">
-            </select>
-        </div>
+
+        <label for="artifactID">Artifact ID</label>
+        <input type="text" id="artifactID" name="artifactID" placeholder="example_mod" required />
+
+        <label for="groupID">Group ID</label>
+        <input type="text" id="groupID" name="groupID" placeholder="me.example" required />
+
+        <label for="gradleVersion">Gradle Version</label>
+        <select id="gradleVersion"></select>
 
         <h2>Mod Configuration</h2>
-        <div>
-            <label for="modName">Mod name</label>
-            <input type="text" id="modName" name="modName" placeholder="modName" required>
-        </div>
-        <div>
-            <label for="modVersion">Mod version</label>
-            <input type="text" id="modVersion" name="modVersion" placeholder="modVersion" required>
-        </div>
-        <div>
-            <label for="environment">Environment</label>
-            <select id="environment">
-                <option value="both">Both</option>
-                <option value="client">Client</option>
-                <option value="server">Server</option>
-            </select>
-        </div>
+
+        <label for="modName">Mod name</label>
+        <input type="text" id="modName" name="modName" placeholder="Mod Name" required />
+
+        <label for="modVersion">Mod version</label>
+        <input type="text" id="modVersion" name="modVersion" placeholder="0.0.1" required />
+
+        <label for="environment">Environment</label>
+        <select id="environment">
+            <option value="both">Both</option>
+            <option value="client">Client</option>
+            <option value="server">Server</option>
+        </select>
 
         <h2>Dependencies Configuration</h2>
+
+        <label for="mcVersion">Minecraft version</label>
+        <select id="mcVersion"></select>
+
         <div>
-            <label for="mcVersion">Minecraft version</label>
-            <select id="mcVersion">
-            </select>
             <label id="mcStableLabel" for="mcStable">Stable?</label>
-            <input type="checkbox" id="mcStable" name="stable" checked>
+            <input type="checkbox" id="mcStable" name="stable" checked />
         </div>
+
+        <label for="loaderVersion">Quilt loader version</label>
+        <select id="loaderVersion"></select>
+
+        <label for="quiltMapping">Quilt Mappings Version</label>
+        <select id="quiltMapping"></select>
+
         <div>
-            <label for="loaderVersion">Quilt loader version</label>
-            <select id="loaderVersion"></select>
+            <label for="useQfapi">Use QSL/QFAPI</label>
+            <input type="checkbox" id="useQfapi" checked />
         </div>
-        <div>
-            <label for="quiltMapping">Quilt Mappings</label>
-            <select id="quiltMapping"></select>
-        </div>
-        <div>
-            <label for="qfapiVersion" id="lbQfapiVersion">Quilted Fabric API (QFAPI)</label>
-            <select id="qfapiVersion"></select>
-        </div>
-        <div>
-            <label for="useMixins">Use Mixins?</label>
-            <input id="useMixins" type="checkbox" checked />
-        </div>
+
+        <label for="qfapiVersion" id="lbQfapiVersion">QSL/QFAPI Version</label>
+        <select id="qfapiVersion"></select>
+
+        <label for="useMixins">Use Mixins?</label>
+        <input id="useMixins" type="checkbox" checked />
 
         <details id="optional_settings">
             <summary>
                 <h2>Optional Settings</h2>
             </summary>
-            <div>
-                <label for="license">License</label>
-                <select id="license">
-                    <option>No License</option>
-                    <option>The Unlicense</option>
-                    <option>Creative Commons Zero</option>
-                    <option>GNU Lesser General Public License v3.0</option>
-                    <option>MIT License</option>
-                    <option>Apache License 2.0</option>
-                </select>
-                <p class="details">For more information see <a href="https://blog.modrinth.com/p/licensing-guide">https://blog.modrinth.com/p/licensing-guide</a></p>
-            </div>
-            <div>
-                <label for="description">Description</label>
-                <textarea id="description" name="description" placeholder="description" rows="5"></textarea>
-            </div>
-            <div>
-                <label for="author">Author</label>
-                <input type="text" id="author" name="author" placeholder="author" />
-            </div>
-            <div>
-                <label for="homepage">Homepage</label>
-                <input type="text" id="homepage" name="homepage" placeholder="homepage" />
-            </div>
-            <div>
-                <label for="sourceRepo">Source Repository</label>
-                <input type="text" id="sourceRepo" name="source" placeholder="source" />
-            </div>
-            <div>
-                <label for="issues">Issues</label>
-                <input type="text" id="issues" name="issues" placeholder="issues" />
-            </div>
+
+            <label for="license">License</label>
+            <select id="license">
+                <option>No License</option>
+                <option>The Unlicense</option>
+                <option>Creative Commons Zero</option>
+                <option>GNU Lesser General Public License v3.0</option>
+                <option>MIT License</option>
+                <option>Apache License 2.0</option>
+            </select>
+            <p class="details">For more information see <a
+                    href="https://blog.modrinth.com/p/licensing-guide">https://blog.modrinth.com/p/licensing-guide</a>
+            </p>
+
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="A short description of your mod."
+                rows="5"></textarea>
+
+            <label for="author">Author</label>
+            <input type="text" id="author" name="author" placeholder="Your name here" />
+
+            <label for="homepage">Homepage</label>
+            <input type="text" id="homepage" name="homepage" placeholder="https://example.com" />
+
+            <label for="sourceRepo">Source Repository</label>
+            <input type="text" id="sourceRepo" name="source"
+                placeholder="https://github.com/example_user/example_mod" />
+
+            <label for="issues">Issues</label>
+            <input type="text" id="issues" name="issues"
+                placeholder="https://github.com/example_user/example_mod/issues" />
         </details>
-    </div>
+    </main>
+
     <div style="text-align: center">
         <button id="gen">
             Generate

@@ -1,8 +1,16 @@
 /**
  * @param {string} mod_id 
+ * @param {boolean} use_qfapi 
  * @returns {string} the content of the build.gralde file
  */
-export function generate_build_gradle(mod_id) {
+export function generate_build_gradle(mod_id, use_qfapi) {
+    const qfapi = use_qfapi
+        ? `\n\n\t// QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
+\t// Quilted Fabric API will automatically pull in the correct QSL version.
+\tmodImplementation libs.quilted.fabric.api
+\t// modImplementation libs.bundles.quilted.fabric.api // If you wish to use Fabric API's deprecated modules, you can replace the above line with this one`
+        : "";
+
     return `plugins {
 \tid 'maven-publish'
 \talias libs.plugins.quilt.loom
@@ -49,12 +57,7 @@ dependencies {
 \t\tofficialMojangMappings()
 \t}
 \t*/
-\tmodImplementation libs.quilt.loader
-
-\t// QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
-\t// Quilted Fabric API will automatically pull in the correct QSL version.
-\tmodImplementation libs.quilted.fabric.api
-\t// modImplementation libs.bundles.quilted.fabric.api // If you wish to use Fabric API's deprecated modules, you can replace the above line with this one
+\tmodImplementation libs.quilt.loader${qfapi}
 }
 
 processResources {
@@ -139,6 +142,7 @@ archives_base_name = ${archive_name}
  * @param {string} minecraft_version 
  * @param {string} quilt_mappings_version 
  * @param {string} quilt_loader_version 
+ * @param {boolean} use_qfapi 
  * @param {string} quilted_fabric_api_version 
  * @returns {string} the content of the libs.versions.toml file
  */
@@ -146,27 +150,36 @@ export function generate_libs_versions_toml(
     minecraft_version,
     quilt_mappings_version,
     quilt_loader_version,
+    use_qfapi,
     quilted_fabric_api_version
 ) {
+    const qfapi_version = use_qfapi
+        ? `\n\nquilted_fabric_api = "${quilted_fabric_api_version}"`
+        : "";
+
+    const qfapi_lib = use_qfapi
+        ? `\n\nquilted_fabric_api = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api", version.ref = "quilted_fabric_api" }
+quilted_fabric_api_deprecated = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api-deprecated", version.ref = "quilted_fabric_api" }`
+        : "";
+
+    const bundle_example = use_qfapi
+        ? 'quilted_fabric_api = ["quilted_fabric_api", "quilted_fabric_api_deprecated"]'
+        : '# example = ["example-a", "example-b", "example-c"]';
+
     return `[versions]
 # The latest versions are available at https://lambdaurora.dev/tools/import_quilt.html
 minecraft = "${minecraft_version}"
 quilt_mappings = "${quilt_mappings_version}"
-quilt_loader = "${quilt_loader_version}"
-
-quilted_fabric_api = "${quilted_fabric_api_version}"
+quilt_loader = "${quilt_loader_version}"${qfapi_version}
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
 quilt_mappings = { module = "org.quiltmc:quilt-mappings", version.ref = "quilt_mappings" }
-quilt_loader = { module = "org.quiltmc:quilt-loader", version.ref = "quilt_loader" }
-
-quilted_fabric_api = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api", version.ref = "quilted_fabric_api" }
-quilted_fabric_api_deprecated = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api-deprecated", version.ref = "quilted_fabric_api" }
+quilt_loader = { module = "org.quiltmc:quilt-loader", version.ref = "quilt_loader" }${qfapi_lib}
 
 # If you have multiple similar dependencies, you can declare a dependency bundle and reference it on the build script with "libs.bundles.example".
 [bundles]
-quilted_fabric_api = ["quilted_fabric_api", "quilted_fabric_api_deprecated"]
+${bundle_example}
 
 [plugins]
 quilt_loom = { id = "org.quiltmc.loom", version = "1.4.1" }
@@ -192,30 +205,41 @@ zipStorePath=wrapper/dists
  * @param {string} mod_id 
  * @param {string} group_id 
  * @param {string} mod_name 
+ * @param {boolean} use_qfapi 
  * @returns {string} the content of the main java class
  */
 export function generate_java_main(
     mod_id,
     group_id,
-    mod_name
+    mod_name,
+    use_qfapi
 ) {
+    const initializer_import = use_qfapi
+        ? `import org.quiltmc.loader.api.ModContainer;
+import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;\n`
+        : "";
+    
+    const initializer_implement = use_qfapi
+        ? "implements ModInitializer "
+        : "";
+
+    const initializer_override = use_qfapi
+        ? `\n\n\t@Override
+\tpublic void onInitialize(ModContainer mod) {
+\t\tLOGGER.info("Hello Quilt world from {}!", mod.metadata().name());
+\t}`
+        : "";
+
     return `package ${group_id}.${mod_id};
 
-import org.quiltmc.loader.api.ModContainer;
-import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;
-import org.slf4j.Logger;
+${initializer_import}import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ${mod_name.replaceAll(" ", "")} implements ModInitializer {
+public class ${mod_name.replaceAll(" ", "")} ${initializer_implement}{
 \t// This logger is used to write text to the console and the log file.
 \t// It is considered best practice to use your mod name as the logger's name.
 \t// That way, it's clear which mod wrote info, warnings, and errors.
-\tpublic static final Logger LOGGER = LoggerFactory.getLogger("${mod_name}");
-
-\t@Override
-\tpublic void onInitialize(ModContainer mod) {
-\t\tLOGGER.info("Hello Quilt world from {}!", mod.metadata().name());
-\t}
+\tpublic static final Logger LOGGER = LoggerFactory.getLogger("${mod_name}");${initializer_override}
 }
 `;
 }
@@ -224,6 +248,7 @@ public class ${mod_name.replaceAll(" ", "")} implements ModInitializer {
  * @param {string} mod_id 
  * @param {string} group_id 
  * @param {string} mod_name 
+ * @param {boolean} use_qfapi 
  * @param {"client"|"both"|"server"} env 
  * @returns {string} the content of the client java class
  */
@@ -231,36 +256,46 @@ export function generate_java_client(
     mod_id,
     group_id,
     mod_name,
+    use_qfapi,
     env
 ) {
+    const initializer_import = use_qfapi
+        ? `import org.quiltmc.loader.api.ModContainer;
+import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;\n`
+        : "";
+    
+    const initializer_implement = use_qfapi
+        ? "implements ClientModInitializer "
+        : "";
+
+    const initializer_override = use_qfapi
+        ? "\n\n\t@Override\n\tpublic void onInitializeClient(ModContainer mod) {}"
+        : "";
+
+    const initializer_override_client_only = use_qfapi
+        ? `\n\n\t@Override
+\tpublic void onInitializeClient(ModContainer mod) {
+\t\tLOGGER.info("Hello Quilt world from {}!", mod.metadata().name());
+\t}`
+        : "";
+
     if (env === "client") {
         return `package ${group_id}.${mod_id}.client;
 
-import org.quiltmc.loader.api.ModContainer;
-import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;
-import org.slf4j.Logger;
+${initializer_import}import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ${mod_name.replaceAll(" ", "")}Client implements ClientModInitializer {
+public class ${mod_name.replaceAll(" ", "")}Client ${initializer_implement}{
 \t// This logger is used to write text to the console and the log file.
 \t// It is considered best practice to use your mod name as the logger's name.
 \t// That way, it's clear which mod wrote info, warnings, and errors.
-\tpublic static final Logger LOGGER = LoggerFactory.getLogger("${mod_name}");
-
-\t@Override
-\tpublic void onInitializeClient(ModContainer mod) {
-\t\tLOGGER.info("Hello Quilt world from {}!", mod.metadata().name());
-\t}
+\tpublic static final Logger LOGGER = LoggerFactory.getLogger("${mod_name}");${initializer_override_client_only}
 }
 `
     } else return `package ${group_id}.${mod_id}.client;
 
-import org.quiltmc.loader.api.ModContainer;
-import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;
-
-public class ${mod_name.replaceAll(" ", "")}Client implements ClientModInitializer {
-\t@Override
-\tpublic void onInitializeClient(ModContainer mod) {}
+${initializer_import}
+public class ${mod_name.replaceAll(" ", "")}Client ${initializer_implement}{${initializer_override}
 }
 `;
 }
@@ -307,6 +342,7 @@ public class TitleScreenMixin {
  * @param {string} issues 
  * @param {string} sources 
  * @param {"client"|"both"|"server"} env 
+ * @param {boolean} use_qfapi 
  * @param {string} quilted_fabric_api_version 
  * @param {string} quilt_loader_version 
  * @param {string} minecraft_version 
@@ -323,30 +359,40 @@ export function generate_quilt_mod_json(
     issues,
     sources,
     env,
+    use_qfapi,
     quilted_fabric_api_version,
     quilt_loader_version,
     minecraft_version,
     use_mixins
 ) {
-    let entrypoints = '\n\t\t"entrypoints": {\n';
-    switch (env) {
-        case "client":
-            entrypoints += `\t\t\t"client_init": "${group_id}.${mod_id}.client.${mod_name.replaceAll(" ", "")}Client"\n`;
-            break
-        case "both":
-            entrypoints += `\t\t\t"init": "${group_id}.${mod_id}.${mod_name.replaceAll(" ", "")}",
+    let entrypoints = "";
+    if (use_qfapi) {
+        entrypoints = '\n\t\t"entrypoints": {\n';
+        switch (env) {
+            case "client":
+                entrypoints += `\t\t\t"client_init": "${group_id}.${mod_id}.client.${mod_name.replaceAll(" ", "")}Client"\n`;
+                break
+            case "both":
+                entrypoints += `\t\t\t"init": "${group_id}.${mod_id}.${mod_name.replaceAll(" ", "")}",
 \t\t\t"client_init": "${group_id}.${mod_id}.client.${mod_name.replaceAll(" ", "")}Client"\n`;
-            break;
-        case "server":
-            entrypoints += `\t\t\t"init": "${group_id}.${mod_id}.${mod_name.replaceAll(" ", "")}"\n`;
-            break;
+                break;
+            case "server":
+                entrypoints += `\t\t\t"init": "${group_id}.${mod_id}.${mod_name.replaceAll(" ", "")}"\n`;
+                break;
+        }
+        entrypoints += '\t\t},';
     }
-    entrypoints += '\t\t},';
 
-    let mixin = "";
-    if (use_mixins) {
-        mixin = `,\n\t"mixin": "${mod_id}.mixins.json"`
-    }
+    const qfapi = use_qfapi
+        ? `\n\t\t\t{
+\t\t\t\t"id": "quilted_fabric_api",
+\t\t\t\t"versions": ">=${quilted_fabric_api_version.replace(/-.+/, "-")}"
+\t\t\t},`
+        : "";
+
+    const mixin = use_mixins
+        ? `,\n\t"mixin": "${mod_id}.mixins.json"`
+        : "";
 
     return `{
 \t"schema_version": 1,
@@ -372,11 +418,7 @@ export function generate_quilt_mod_json(
 \t\t\t{
 \t\t\t\t"id": "quilt_loader",
 \t\t\t\t"versions": ">=${quilt_loader_version.replace(/-.+/, "-")}"
-\t\t\t},
-\t\t\t{
-\t\t\t\t"id": "quilted_fabric_api",
-\t\t\t\t"versions": ">=${quilted_fabric_api_version.replace(/-.+/, "-")}"
-\t\t\t},
+\t\t\t},${qfapi}
 \t\t\t{
 \t\t\t\t"id": "minecraft",
 \t\t\t\t"versions": "~${minecraft_version}"

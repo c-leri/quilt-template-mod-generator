@@ -17,6 +17,7 @@ export async function gen_and_download_zip() {
     const mc_ver = document.getElementById("mcVersion").value;
     const loader_ver = document.getElementById("loaderVersion").value;
     const q_mapping_ver = document.getElementById("quiltMapping").value.toString();
+    const use_qfapi = document.getElementById("useQfapi").checked;
     const qfapi_ver = document.getElementById("qfapiVersion").value.toString();
     const use_mixins = document.getElementById("useMixins").checked;
 
@@ -42,16 +43,15 @@ export async function gen_and_download_zip() {
         return;
     }
 
-    if (qfapi_ver === "") {
+    if (use_qfapi && qfapi_ver === "") {
         window.alert("Quilted Fabric API for Minecraft version " + mc_ver + " cannot be found!\n" +
-        "Please choose a Minecraft version with for which a Quilt Fabric API version exists");
-        return;
+        "Your project will be generated without QFAPI.");
     }
 
     let zip = gen_prj_zip(
         artifact_id, group_id, gradle_ver,
         mod_name, mod_ver, env,
-        mc_ver, loader_ver, q_mapping_ver, qfapi_ver, use_mixins,
+        mc_ver, loader_ver, q_mapping_ver, use_qfapi, qfapi_ver, use_mixins,
         license, desc, author, homepage, source_repo, issues
     );
 
