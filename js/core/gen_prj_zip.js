@@ -48,7 +48,7 @@ function add_license_file_to_folder(folder, license, author) {
 
     if (license === "MIT") {
         license_content = generate_mit_license(author);
-    } else if (license !== "No License") {
+    } else if (license) {
         license_content = get_license_file_content(`${license}.txt`)
     }
 
@@ -158,7 +158,7 @@ export function gen_prj_zip(
             quilt_loader_version,
             minecraft_version,
             use_mixins,
-            license !== "No License" ? license : ""
+            license
         )
     );
 
