@@ -1,7 +1,6 @@
 const GRADLE_VERSIONS = "https://services.gradle.org/versions/all";
 const QUILT_META = "https://meta.quiltmc.org/v3";
 const QUILT_RELEASE_MAVEN = "https://maven.quiltmc.org/repository/release";
-const QUILT_SNAPSHOT_MAVEN = "https://maven.quiltmc.org/repository/snapshot";
 
 export async function gradle_versions() {
     return await fetch(GRADLE_VERSIONS, {
@@ -30,7 +29,7 @@ export async function gradle_versions() {
 
 export async function minecraft_versions(stable = true) {
     const url = QUILT_META + "/versions/game";
-    let response = await fetch(url, {
+    const response = await fetch(url, {
         method: "GET",
         headers: {
             "Accept": "application/json"
@@ -43,7 +42,10 @@ export async function minecraft_versions(stable = true) {
         json = json.filter((minecraft_version) => minecraft_version.stable);
     }
 
-    return json.map((minecraft_version) => minecraft_version.version);
+    const index_of_1_18_2 = json.findIndex((minecraft_version) => minecraft_version.version === "1.18.2");
+
+    // exclude versions prior to 1.18.2
+    return json.map((minecraft_version) => minecraft_version.version).slice(0, index_of_1_18_2 + 1);
 }
 
 
@@ -52,76 +54,28 @@ export async function minecraft_versions(stable = true) {
  * @returns {string[]} qfapi versions for the given minecraft versions
  */
 export async function qfapi_versions(mc_ver) {
-    const urls = [
-        QUILT_RELEASE_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml",
-        QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml"
-    ];
+    const url = QUILT_RELEASE_MAVEN + "/org/quiltmc/quilted-fabric-api/quilted-fabric-api/maven-metadata.xml";
 
     // get all the qfapi versions
-    let versions = [];
-    await Promise.all(
-        urls.map(async (url) => {
-            let response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/xml"
-                }
-            });
+    let response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Accept": "application/xml"
+        }
+    });
 
-            const xml = await response.text();
-            let parser = new DOMParser();
-            const doc = parser.parseFromString(xml, "text/xml");
+    const xml = await response.text();
+    let parser = new DOMParser();
+    const doc = parser.parseFromString(xml, "text/xml");
 
-            Array.from(doc.getElementsByTagName("version")).map((version_element) =>
-                versions.push(version_element.textContent)
-            )
-        })
+    const versions = Array.from(doc.getElementsByTagName("version")).map((version_element) =>
+        version_element.textContent
     );
 
     return versions
         // get only the version corresponding to the selected minecraft version
-        .filter((version) => version.endsWith(mc_ver) || version.endsWith(mc_ver + "-SNAPSHOT"))
-        // sort in inverse alphabetical order
-        .sort((a, b) => a.localeCompare(b) * -1);
-}
-
-/**
- * @param {string} mc_ver the selected minecraft version
- * @returns {string[]} qsl versions for the given minecraft versions
- */
-export async function qsl_versions(mc_ver) {
-    const urls = [
-        QUILT_RELEASE_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml",
-        QUILT_SNAPSHOT_MAVEN + "/org/quiltmc/qsl/maven-metadata.xml"
-    ]
-
-    // get all the qsl versions
-    let versions = [];
-    await Promise.all(
-        urls.map(async (url) => {
-            let response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/xml"
-                }
-            });
-
-            const xml = await response.text();
-            let parser = new DOMParser();
-            const doc = parser.parseFromString(xml, "text/xml");
-
-            Array.from(doc.getElementsByTagName("version")).map((version_element) =>
-                versions.push(version_element.textContent)
-            )
-        })
-    );
-
-    return versions
-        // get only the version corresponding to the selected minecraft version
-        // excluding the "-SNAPSHOT" because they cause issues in the generated template
-        .filter((version) => version.endsWith(mc_ver) || version.endsWith(mc_ver + "-SNAPSHOT"))
-        // sort in inverse alphabetical order
-        .sort((a, b) => a.localeCompare(b) * -1);
+        .filter((version) => version.endsWith(mc_ver))
+        .reverse()
 }
 
 

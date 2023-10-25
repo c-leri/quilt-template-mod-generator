@@ -2,7 +2,6 @@ import {
     gradle_versions,
     minecraft_versions,
     qfapi_versions,
-    qsl_versions,
     quilt_loader_versions,
     quilt_mapping_versions,
 } from "./get_version/get_vers.js";
@@ -64,11 +63,9 @@ export async function reload_mc_versions(stable) {
  */
 export async function reload_q_dpendencies_list(mc_ver) {
     let q_mapping_ver_select = document.getElementById("quiltMapping");
-    let qsl_ver_select = document.getElementById("qslVersion");
     let qfapi_ver_select = document.getElementById("qfapiVersion");
 
     q_mapping_ver_select.innerHTML = "";
-    qsl_ver_select.innerHTML = "";
     qfapi_ver_select.innerHTML = "";
 
     // asynchonously get and display quilt mapping versions
@@ -79,17 +76,6 @@ export async function reload_q_dpendencies_list(mc_ver) {
             option.value = ver;
             option.innerText = ver;
             q_mapping_ver_select.append(option);
-        })
-    );
-
-    // asynchonously get and display qsl versions
-    // using the selected minecraft version
-    qsl_versions(mc_ver).then((qsl_version_list) =>
-        qsl_version_list.forEach((ver) => {
-            let option = document.createElement("option");
-            option.value = ver;
-            option.innerText = ver;
-            qsl_ver_select.append(option);
         })
     );
 

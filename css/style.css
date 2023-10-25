@@ -24,7 +24,8 @@ h1 {
 h2 {
     color: #90f;
     font-size: 28px;
-    margin-top: 10%;
+    margin-top: 30px;
+    margin-bottom: 15px;
 }
 
 input[type=text] {
@@ -38,10 +39,6 @@ input[type=text] {
 input[type=checkbox] {
     zoom: 150%;
     vertical-align:middle;
-}
-
-label {
-    vertical-align: middle;
 }
 
 select {
@@ -67,12 +64,60 @@ select {
     cursor: pointer;
 }
 
-#main {
+main {
     background-color: #dddddd;
-    border-radius: 5px;
+    border-radius: 10px;
     margin: 1% auto 1% auto;
     padding: 30px 120px;
     width: 500px;
+}
+
+main label:not([hidden]) {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+main #mcStableLabel {
+    margin-top: 0;
+}
+
+main .details {
+    color: #777777;
+    font-size: 15px;
+}
+
+#optional_settings > summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+#optional_settings > summary > h2 {
+    margin: 0;
+}
+
+#optional_settings > summary:before {
+    font-family: monospace;
+    content: "►";
+}
+
+#optional_settings[open] > summary:before {
+    font-family: monospace;
+    content: "▼";
+}
+
+#optional_settings p {
+    margin: 0;
+}
+
+#description {
+    width: 100%;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    resize:vertical;
 }
 
 #gen {
@@ -85,11 +130,6 @@ select {
     text-decoration: none;
     display: inline-block;
     font-size: 24px;
-}
-
-#description {
-    font-size: 16px;
-    border-radius: 5px;
 }
 
 #pageFooter {

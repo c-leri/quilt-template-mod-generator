@@ -2,84 +2,183 @@ import "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
 import "https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js";
 
 import {
-    generate_build_gradle,
     generate_gradle_properties,
-    generate_gradle_wrapper,
-    generate_java_mod_client,
-    generate_java_mod_main,
+    generate_libs_versions_toml,
+    generate_gradle_wrapper_properties,
+    generate_java_main,
+    generate_java_client,
+    generate_java_mixin,
+    generate_quilt_mod_json,
     generate_mixins_json,
-    generate_quilt_mod_json, generate_settings_gradle
+    generate_build_gradle,
+    generate_mit_license
 } from "./gen_files_content.js";
 
+/**
+ * @param {string} fileName the name of the file to get
+ * @returns a promise of the requested file data
+ */
+async function get_static_file_data(fileName) {
+    return (await fetch("res/static/" + fileName)).arrayBuffer();
+}
 
+/**
+ * @param {JSZip} folder the folder to add the file to
+ * @param {string} fileName the name of the file to add
+ */
+function add_static_file_to_folder(folder, fileName) {
+    folder.file(fileName, get_static_file_data(fileName), { binary: true });
+}
+
+/**
+ * @param {string} fileName 
+ * @returns {string} the license file's content
+ */
+async function get_license_file_content(fileName) {
+    return (await fetch("res/static/licenses/" + fileName, { headers: { "Accept": "text/plain" } })).text();
+}
+
+/**
+ * @param {JSZip} folder the folder to add the file to
+ * @param {string} license the name of the license to add
+ * @param {string} author the name of the mod's author
+ */
+function add_license_file_to_folder(folder, license, author) {
+    let license_content = "";
+
+    switch (license) {
+        case "The Unlicense":
+            license_content = get_license_file_content("Unlicense.txt");
+            break;
+        case "Creative Commons Zero":
+            license_content = get_license_file_content("CC0-1.0.txt");
+            break;
+        case "GNU Lesser General Public License v3.0":
+            license_content = get_license_file_content("LGPL-3.0-only.txt");
+            break;
+        case "MIT License":
+            license_content = generate_mit_license(author);
+            break;
+        case "Apache License 2.0":
+            license_content = get_license_file_content("Apache-2.0.txt");
+            break;
+    }
+
+    if (license_content) {
+        folder.file("LICENSE", license_content);
+    }
+}
+
+/**
+ * @param {string} archive_name 
+ * @param {string} group_id 
+ * @param {string} gradle_version 
+ * @param {string} mod_name 
+ * @param {string} mod_version 
+ * @param {"client"|"both"|"server"} env 
+ * @param {string} minecraft_version 
+ * @param {string} quilt_loader_version 
+ * @param {string} quilt_mappings_version 
+ * @param {boolean} use_qfapi 
+ * @param {string} quilted_fabric_api_version 
+ * @param {boolean} use_mixins 
+ * @param {string} license 
+ * @param {string} description 
+ * @param {string} author 
+ * @param {string} homepage 
+ * @param {string} sources 
+ * @param {string} issues 
+ * @returns {JSZip} the generated template
+ */
 export function gen_prj_zip(
-    artifact_id, group_id, gradle_ver, use_q_decompiler,
-    mod_name, mod_version, env,
-    mc_ver, q_loader_ver, q_mapping_ver, qsl_ver, qfapi_ver, use_qsl, use_mixins,
-    desc, author, homepage, source_repo, issues) {
+    archive_name,
+    group_id,
+    gradle_version,
+    mod_name,
+    mod_version,
+    env,
+    minecraft_version,
+    quilt_loader_version,
+    quilt_mappings_version,
+    use_qfapi,
+    quilted_fabric_api_version,
+    use_mixins,
+    license,
+    description,
+    author,
+    homepage,
+    sources,
+    issues
+) {
     const zip = new JSZip();
-    if (qsl_ver === "" || qfapi_ver === "") {
-        use_qsl = false;
-    }
-    zip.file("gradle/wrapper/gradle-wrapper.properties",
-        generate_gradle_wrapper(gradle_ver));
-    zip.file("gradle.properties",
-        generate_gradle_properties(
-            mc_ver,
-            q_mapping_ver,
-            q_loader_ver,
-            mod_version,
-            group_id,
-            artifact_id,
-            qsl_ver,
-            qfapi_ver));
-    zip.file("settings.gradle", generate_settings_gradle());
-    zip.file("build.gradle",
-        generate_build_gradle(
-            artifact_id,
-            group_id,
-            use_q_decompiler,
-            use_qsl,
-            qsl_ver.endsWith("-SNAPSHOT") ? "-SNAPSHOT" : "",
-            qfapi_ver.endsWith("-SNAPSHOT") ? "-SNAPSHOT" : "")
+
+    add_static_file_to_folder(zip, ".editorconfig");
+    add_static_file_to_folder(zip, ".gitattributes")
+    add_static_file_to_folder(zip, ".gitignore");
+    add_static_file_to_folder(zip, "gradlew");
+    add_static_file_to_folder(zip, "gradlew.bat");
+    add_static_file_to_folder(zip, "settings.gradle");
+
+    add_license_file_to_folder(zip, license, author);
+
+    zip.file("build.gradle", generate_build_gradle(archive_name, use_qfapi));
+    zip.file("gradle.properties", generate_gradle_properties(mod_version, group_id, archive_name));
+
+    const gradle_folder = zip.folder("gradle");
+    gradle_folder.file(
+        "libs.versions.toml",
+        generate_libs_versions_toml(minecraft_version, quilt_mappings_version, quilt_loader_version, use_qfapi, quilted_fabric_api_version)
     );
-    zip.file("src/main/resources/quilt.mod.json",
-        generate_quilt_mod_json(
-            artifact_id,
-            group_id,
-            mod_name,
-            author,
-            desc,
-            homepage,
-            source_repo,
-            issues,
-            env,
-            use_mixins,
-            use_qsl));
-    if (use_mixins) {
-        zip.file("src/main/resources/mixins.json", generate_mixins_json(artifact_id, group_id));
-    }
+
+    const gradle_wrapper_folder = gradle_folder.folder("wrapper");
+    add_static_file_to_folder(gradle_wrapper_folder, "gradle-wrapper.jar");
+    gradle_wrapper_folder.file("gradle-wrapper.properties", generate_gradle_wrapper_properties(gradle_version));
+
+    const main_folder = zip.folder("src/main");
+
+    const mod_package = main_folder.folder(`java/${group_id.replaceAll(".", "/")}/${archive_name}`);
+
     if (env === "server" || env === "both") {
-        zip.file("src/main/java/" + group_id.replaceAll(".", "/") + "/" + artifact_id + "/" + mod_name.replaceAll(" ", "") + ".java",
-            generate_java_mod_main(
-                artifact_id,
-                group_id,
-                mod_name,
-                use_qsl));
+        mod_package.file(`${mod_name.replaceAll(" ", "")}.java`, generate_java_main(archive_name, group_id, mod_name, use_qfapi));
     }
+
     if (env === "client" || env === "both") {
-        zip.file("src/main/java/" + group_id.replaceAll(".", "/") + "/" + artifact_id + "/client/" + mod_name.replaceAll(" ", "") + "Client.java",
-            generate_java_mod_client(
-                artifact_id,
-                group_id,
-                mod_name,
-                use_qsl));
+        const client_package = mod_package.folder("client");
+        client_package.file(`${mod_name.replaceAll(" ", "")}Client.java`, generate_java_client(archive_name, group_id, mod_name, use_qfapi, env));
     }
-    // read the icon file as binary string from the server res/favicon.ico
-    let icon_data = fetch("res/static/icon.png").then(function (response) {
-        return response.arrayBuffer();
-    });
-    zip.file("src/main/resources/assets/" + artifact_id + "/icon.png", icon_data, {binary: true});
+
+    if (use_mixins) {
+        const mixin_package = mod_package.folder("mixin");
+        mixin_package.file("TitleScreenMixin.java", generate_java_mixin(archive_name, group_id, mod_name, env))
+    }
+
+    const resources_folder = main_folder.folder("resources");
+    resources_folder.file(
+        "quilt.mod.json",
+        generate_quilt_mod_json(
+            group_id,
+            archive_name,
+            mod_name,
+            description,
+            author,
+            homepage,
+            issues,
+            sources,
+            env,
+            use_qfapi,
+            quilted_fabric_api_version,
+            quilt_loader_version,
+            minecraft_version,
+            use_mixins
+        )
+    );
+
+    if (use_mixins) {
+        resources_folder.file(`${archive_name}.mixins.json`, generate_mixins_json(archive_name, group_id));
+    }
+
+    const mod_assets_folder = resources_folder.folder(`assets/${archive_name}`);
+    add_static_file_to_folder(mod_assets_folder, "icon.png");
 
     return zip;
 }
