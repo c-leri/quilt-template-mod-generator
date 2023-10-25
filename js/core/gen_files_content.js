@@ -347,7 +347,7 @@ public class TitleScreenMixin {
  * @param {string} quilt_loader_version 
  * @param {string} minecraft_version 
  * @param {boolean} use_mixins
- * @param {string} license_name
+ * @param {string} license_spdx_id
  * @returns {string} the content of the quilt.mod.json file
  */
 export function generate_quilt_mod_json(
@@ -365,7 +365,7 @@ export function generate_quilt_mod_json(
     quilt_loader_version,
     minecraft_version,
     use_mixins,
-    license_name= ""
+    license_spdx_id
 ) {
     let entrypoints = "";
     if (use_qfapi) {
@@ -412,8 +412,7 @@ export function generate_quilt_mod_json(
 \t\t\t\t"homepage": "${homepage}",
 \t\t\t\t"issues": "${issues}",
 \t\t\t\t"sources": "${sources}"
-\t\t\t},
-\t\t\t${license_name ? `"license": "${license_name}",` : ""}
+\t\t\t},${license_spdx_id ? `\n\t\t\t"license": "${license_spdx_id}",` : ""}
 \t\t\t"icon": "assets/${mod_id}/icon.png"
 \t\t},
 \t\t"intermediate_mappings": "net.fabricmc:intermediary",${entrypoints}

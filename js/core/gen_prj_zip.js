@@ -46,31 +46,10 @@ async function get_license_file_content(fileName) {
 function add_license_file_to_folder(folder, license, author) {
     let license_content = "";
 
-    switch (license) {
-        case "The Unlicense":
-            license_content = get_license_file_content("Unlicense.txt");
-            break;
-        case "Creative Commons Zero":
-            license_content = get_license_file_content("CC0-1.0.txt");
-            break;
-        case "GNU General Public License v3.0":
-            license_content = get_license_file_content("GPL-3.0.txt");
-            break;
-        case "GNU Lesser General Public License v3.0":
-            license_content = get_license_file_content("LGPL-3.0-only.txt");
-            break;
-        case "GNU Affero General Public License v3.0":
-            license_content = get_license_file_content("AGPL-3.0.txt");
-            break;
-        case "MIT License":
-            license_content = generate_mit_license(author);
-            break;
-        case "Apache License 2.0":
-            license_content = get_license_file_content("Apache-2.0.txt");
-            break;
-        case "Mozilla Public License 2.0":
-            license_content = get_license_file_content("MPL-2.0.txt");
-            break;
+    if (license === "MIT") {
+        license_content = generate_mit_license(author);
+    } else if (license !== "No License") {
+        license_content = get_license_file_content(`${license}.txt`)
     }
 
     if (license_content) {
