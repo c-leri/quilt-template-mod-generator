@@ -215,7 +215,8 @@ zipStorePath=wrapper/dists
 /**
  * @param {string} mod_id 
  * @param {string} group_id 
- * @param {string} mod_name 
+ * @param {string} mod_name
+ * @param {string} mod_java_name 
  * @param {boolean} use_qfapi 
  * @returns {string} the content of the main java class
  */
@@ -223,6 +224,7 @@ export function generate_java_main(
     mod_id,
     group_id,
     mod_name,
+    mod_java_name,
     use_qfapi
 ) {
     const initializer_import = use_qfapi
@@ -246,7 +248,7 @@ import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;\n`
 ${initializer_import}import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ${mod_name.replaceAll(" ", "")} ${initializer_implement}{
+public class ${mod_java_name} ${initializer_implement}{
 \t// This logger is used to write text to the console and the log file.
 \t// It is considered best practice to use your mod name as the logger's name.
 \t// That way, it's clear which mod wrote info, warnings, and errors.
@@ -259,6 +261,7 @@ public class ${mod_name.replaceAll(" ", "")} ${initializer_implement}{
  * @param {string} mod_id 
  * @param {string} group_id 
  * @param {string} mod_name 
+ * @param {string} mod_java_name 
  * @param {boolean} use_qfapi 
  * @param {"client"|"both"|"server"} env 
  * @returns {string} the content of the client java class
@@ -267,6 +270,7 @@ export function generate_java_client(
     mod_id,
     group_id,
     mod_name,
+    mod_java_name,
     use_qfapi,
     env
 ) {
@@ -298,7 +302,7 @@ import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;${env !==
 
         return `package ${group_id}.${mod_id}.client;
 ${initializer_import}${logger_import}
-public class ${mod_name.replaceAll(" ", "")}Client ${initializer_implement}{
+public class ${mod_java_name}Client ${initializer_implement}{
 ${logger_declaration}${initializer_override}}
 `;
 }
@@ -307,6 +311,7 @@ ${logger_declaration}${initializer_override}}
  * @param {string} mod_id 
  * @param {string} group_id 
  * @param {string} mod_name 
+ * @param {mod_java_name} mod_java_name 
  * @param {"client"|"both"|"server"} env 
  * @returns {string} the content of the mixin example java class
  */
@@ -314,11 +319,12 @@ export function generate_java_mixin(
     mod_id,
     group_id,
     mod_name,
+    mod_java_name,
     env
 ) {
     return `package ${group_id}.${mod_id}.mixin;
 
-import ${group_id}.${mod_id}.${env === "client" ? "client." + mod_name.replaceAll(" ", "") + "Client" : mod_name.replaceAll(" ", "")};
+import ${group_id}.${mod_id}.${env === "client" ? "client." + mod_java_name + "Client" : mod_java_name};
 ${env === "server" ? "import net.minecraft.server.MinecraftServer;" : "import net.minecraft.client.gui.screen.TitleScreen;"}
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -329,7 +335,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ${env === "server" ? "MinecraftServer" : "TitleScreen"}Mixin {
 \t@Inject(method = "${env === "server" ? "loadWorld" : "init"}", at = @At("TAIL"))
 \tpublic void onInit(CallbackInfo ci) {
-\t\t${env === "client" ? mod_name.replaceAll(" ", "") + "Client" : mod_name.replaceAll(" ", "")}.LOGGER.info("This line is printed by a mixin of ${mod_name}!");
+\t\t${env === "client" ? mod_java_name + "Client" : mod_java_name}.LOGGER.info("This line is printed by a mixin of ${mod_name}!");
 \t}
 }
 `;
@@ -339,7 +345,8 @@ public class ${env === "server" ? "MinecraftServer" : "TitleScreen"}Mixin {
  * @param {string} group_id 
  * @param {string} mod_id 
  * @param {string} mod_name 
- * @param {string} description 
+ * @param {string} mod_java_name 
+ * @param {string} description_content
  * @param {string} author 
  * @param {string} homepage 
  * @param {string} issues 
@@ -357,6 +364,7 @@ export function generate_quilt_mod_json(
     group_id,
     mod_id,
     mod_name,
+    mod_java_name,
     description_content,
     author,
     homepage,
@@ -375,14 +383,14 @@ export function generate_quilt_mod_json(
         entrypoints = '\n\t\t"entrypoints": {\n';
         switch (env) {
             case "client":
-                entrypoints += `\t\t\t"client_init": "${group_id}.${mod_id}.client.${mod_name.replaceAll(" ", "")}Client"\n`;
+                entrypoints += `\t\t\t"client_init": "${group_id}.${mod_id}.client.${mod_java_name}Client"\n`;
                 break
             case "both":
-                entrypoints += `\t\t\t"init": "${group_id}.${mod_id}.${mod_name.replaceAll(" ", "")}",
-\t\t\t"client_init": "${group_id}.${mod_id}.client.${mod_name.replaceAll(" ", "")}Client"\n`;
+                entrypoints += `\t\t\t"init": "${group_id}.${mod_id}.${mod_java_name}",
+\t\t\t"client_init": "${group_id}.${mod_id}.client.${mod_java_name}Client"\n`;
                 break;
             case "server":
-                entrypoints += `\t\t\t"init": "${group_id}.${mod_id}.${mod_name.replaceAll(" ", "")}"\n`;
+                entrypoints += `\t\t\t"init": "${group_id}.${mod_id}.${mod_java_name}"\n`;
                 break;
         }
         entrypoints += '\t\t},';
@@ -392,7 +400,7 @@ export function generate_quilt_mod_json(
     if (homepage || issues || sources) {
         contact = '\n\t\t\t"contact": {';
 
-        if (description) {
+        if (homepage) {
             contact += `\n\t\t\t\t"homepage": "${homepage}"${issues || sources ? "," : ""}`;
         }
 
@@ -424,7 +432,7 @@ export function generate_quilt_mod_json(
     const qfapi = use_qfapi
         ? `\n\t\t\t{
 \t\t\t\t"id": "quilted_fabric_api",
-\t\t\t\t"versions": ">=${quilted_fabric_api_version.replace(/-.+/, "-")}"
+\t\t\t\t"versions": ">=${quilted_fabric_api_version.replace(/-.+/g, "-")}"
 \t\t\t},`
         : "";
 
@@ -446,7 +454,7 @@ export function generate_quilt_mod_json(
 \t\t"depends": [
 \t\t\t{
 \t\t\t\t"id": "quilt_loader",
-\t\t\t\t"versions": ">=${quilt_loader_version.replace(/-.+/, "-")}"
+\t\t\t\t"versions": ">=${quilt_loader_version.replace(/-.+/g, "-")}"
 \t\t\t},${qfapi}
 \t\t\t{
 \t\t\t\t"id": "minecraft",

@@ -62,6 +62,7 @@ async function add_license_file_to_folder(folder, license, author) {
  * @param {string} group_id 
  * @param {string} gradle_version 
  * @param {string} mod_name 
+ * @param {string} mod_java_name 
  * @param {string} mod_version 
  * @param {"client"|"both"|"server"} env 
  * @param {string} minecraft_version 
@@ -83,6 +84,7 @@ export async function gen_prj_zip(
     group_id,
     gradle_version,
     mod_name,
+    mod_java_name,
     mod_version,
     env,
     minecraft_version,
@@ -129,17 +131,17 @@ export async function gen_prj_zip(
     const mod_package = main_folder.folder(`java/${group_id.replaceAll(".", "/")}/${archive_name}`);
 
     if (env === "server" || env === "both") {
-        mod_package.file(`${mod_name.replaceAll(" ", "")}.java`, generate_java_main(archive_name, group_id, mod_name, use_qfapi));
+        mod_package.file(`${mod_java_name}.java`, generate_java_main(archive_name, group_id, mod_name, mod_java_name, use_qfapi));
     }
 
     if (env === "client" || env === "both") {
         const client_package = mod_package.folder("client");
-        client_package.file(`${mod_name.replaceAll(" ", "")}Client.java`, generate_java_client(archive_name, group_id, mod_name, use_qfapi, env));
+        client_package.file(`${mod_java_name}Client.java`, generate_java_client(archive_name, group_id, mod_name, mod_java_name, use_qfapi, env));
     }
 
     if (use_mixins) {
         const mixin_package = mod_package.folder("mixin");
-        mixin_package.file(`${env === "server" ? "MinecraftServerMixin" : "TitleScreenMixin"}.java`, generate_java_mixin(archive_name, group_id, mod_name, env))
+        mixin_package.file(`${env === "server" ? "MinecraftServerMixin" : "TitleScreenMixin"}.java`, generate_java_mixin(archive_name, group_id, mod_name, mod_java_name, env))
     }
 
     const resources_folder = main_folder.folder("resources");
@@ -149,6 +151,7 @@ export async function gen_prj_zip(
             group_id,
             archive_name,
             mod_name,
+            mod_java_name,
             description,
             author,
             homepage,

@@ -4,13 +4,14 @@ import {gen_prj_zip} from "./core/gen_prj_zip.js";
 export async function gen_and_download_zip() {
     // TODO: test if all required fields are filled
     // project config
-    const artifact_id = document.getElementById("artifactID").value;
-    const group_id = document.getElementById("groupID").value;
+    const artifact_id = document.getElementById("artifactID").value.toLowerCase().replaceAll(/[\.\s]/g, "_").replaceAll(/[^a-zA-Z\d_]/g, "");
+    const group_id = document.getElementById("groupID").value.toLowerCase().replaceAll(" ", "_").replaceAll(/[^a-zA-Z\d_\.]/g, "");
     const gradle_ver = document.getElementById("gradleVersion").value;
 
     // mod config
-    const mod_name = document.getElementById("modName").value;
-    const mod_ver = document.getElementById("modVersion").value;
+    const mod_name = document.getElementById("modName").value.replaceAll(/["\\$]+/g, "");
+    const mod_java_name = mod_name.replaceAll(/[^a-zA-Z\d]|\s/g, "");
+    const mod_ver = document.getElementById("modVersion").value.toLowerCase().replaceAll(/[^a-z_\d\.+-]/g, "");
     const env = document.getElementById("environment").value;
 
     // dependency config
@@ -23,11 +24,11 @@ export async function gen_and_download_zip() {
 
     // optional config
     const license = document.getElementById("license").value;
-    const desc = document.getElementById("description").value.toString().replaceAll("\n", "\\n");
-    const author = document.getElementById("author").value;
-    const homepage = document.getElementById("homepage").value;
-    const source_repo = document.getElementById("sourceRepo").value;
-    const issues = document.getElementById("issues").value;
+    const desc = document.getElementById("description").value.replaceAll("\n", "\\n").replaceAll(/["\\$]+/g, "");
+    const author = document.getElementById("author").value.replaceAll(/["\\$]+/g, "");
+    const homepage = document.getElementById("homepage").value.replaceAll(/["\\$]+/g, "");
+    const source_repo = document.getElementById("sourceRepo").value.replaceAll(/["\\$]+/g, "");
+    const issues = document.getElementById("issues").value.replaceAll(/["\\$]+/g, "");
 
     if (artifact_id === "") {
         window.alert("Artifact ID cannot be empty!");
@@ -50,7 +51,7 @@ export async function gen_and_download_zip() {
 
     let zip = await gen_prj_zip(
         artifact_id, group_id, gradle_ver,
-        mod_name, mod_ver, env,
+        mod_name, mod_java_name, mod_ver, env,
         mc_ver, loader_ver, q_mapping_ver, use_qfapi, qfapi_ver, use_mixins,
         license, desc, author, homepage, source_repo, issues
     );
@@ -59,7 +60,7 @@ export async function gen_and_download_zip() {
         function (ctx_) {
             let link = document.createElement("a");
             link.href = URL.createObjectURL(ctx_);
-            link.download = mod_name.replaceAll(" ", "-") + ".zip";
+            link.download = mod_name.replaceAll(" ", "-").replaceAll(/[<>:/\|\?\*]+/g, "") + ".zip";
             link.click();
         }
     );
