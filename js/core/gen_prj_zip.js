@@ -169,7 +169,8 @@ export function gen_prj_zip(
             quilted_fabric_api_version,
             quilt_loader_version,
             minecraft_version,
-            use_mixins
+            use_mixins,
+            license !== "No License" ? license : ""
         )
     );
 
