@@ -48,7 +48,7 @@ export async function gen_and_download_zip() {
         "Your project will be generated without QFAPI.");
     }
 
-    let zip = gen_prj_zip(
+    let zip = await gen_prj_zip(
         artifact_id, group_id, gradle_ver,
         mod_name, mod_ver, env,
         mc_ver, loader_ver, q_mapping_ver, use_qfapi, qfapi_ver, use_mixins,

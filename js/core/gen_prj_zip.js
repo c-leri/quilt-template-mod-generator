@@ -16,27 +16,21 @@ import {
 } from "./gen_files_content.js";
 
 /**
- * @param {string} fileName the name of the file to get
- * @returns a promise of the requested file data
- */
-async function get_static_file_data(fileName) {
-    return (await fetch("res/static/" + fileName)).arrayBuffer();
-}
-
-/**
  * @param {JSZip} folder the folder to add the file to
  * @param {string} fileName the name of the file to add
+ * @param {string} fileType the file's MIME type
  */
-function add_static_file_to_folder(folder, fileName) {
-    folder.file(fileName, get_static_file_data(fileName), { binary: true });
-}
-
-/**
- * @param {string} fileName 
- * @returns {string} the license file's content
- */
-async function get_license_file_content(fileName) {
-    return (await fetch("res/static/licenses/" + fileName, { headers: { "Accept": "text/plain" } })).text();
+async function add_static_file_to_folder(folder, fileName, fileType) {
+    folder.file(
+        fileName,
+        (await fetch("res/static/" + fileName.replaceAll(".", "-"),{
+            method: "GET",
+            headers: {
+                "Accept": fileType
+            }
+        }).catch((err) => console.error(err))).arrayBuffer(),
+        { binary: true }
+    );
 }
 
 /**
@@ -44,13 +38,18 @@ async function get_license_file_content(fileName) {
  * @param {string} license the name of the license to add
  * @param {string} author the name of the mod's author
  */
-function add_license_file_to_folder(folder, license, author) {
+async function add_license_file_to_folder(folder, license, author) {
     let license_content = "";
 
     if (license === "MIT") {
         license_content = generate_mit_license(author);
     } else if (license) {
-        license_content = get_license_file_content(`${license}.txt`)
+        license_content = (await fetch("res/static/licenses/" + fileName,{
+            method: "GET",
+            headers: {
+                "Accept": "text/plain"
+            } 
+        })).text()
     }
 
     if (license_content) {
@@ -79,7 +78,7 @@ function add_license_file_to_folder(folder, license, author) {
  * @param {string} issues 
  * @returns {JSZip} the generated template
  */
-export function gen_prj_zip(
+export async function gen_prj_zip(
     archive_name,
     group_id,
     gradle_version,
@@ -101,14 +100,15 @@ export function gen_prj_zip(
 ) {
     const zip = new JSZip();
 
-    add_static_file_to_folder(zip, ".editorconfig");
-    add_static_file_to_folder(zip, ".gitattributes")
-    add_static_file_to_folder(zip, ".gitignore");
-    add_static_file_to_folder(zip, "gradlew");
-    add_static_file_to_folder(zip, "gradlew.bat");
-    add_static_file_to_folder(zip, "settings.gradle");
-
-    add_license_file_to_folder(zip, license, author);
+    await Promise.all([
+        add_static_file_to_folder(zip, ".editorconfig", "text/plain"),
+        add_static_file_to_folder(zip, ".gitattributes", "text/plain"),
+        add_static_file_to_folder(zip, ".gitignore", "text/plain"),
+        add_static_file_to_folder(zip, "gradlew", "text/plain"),
+        add_static_file_to_folder(zip, "gradlew.bat", "text/plain"),
+        add_static_file_to_folder(zip, "settings.gradle", "text/plain"),
+        add_license_file_to_folder(zip, license, author)
+    ]);
 
     zip.file("build.gradle", generate_build_gradle(archive_name, use_qfapi));
     zip.file("gradle.properties", generate_gradle_properties(mod_version, group_id, archive_name));
@@ -121,7 +121,7 @@ export function gen_prj_zip(
     );
 
     const gradle_wrapper_folder = gradle_folder.folder("wrapper");
-    add_static_file_to_folder(gradle_wrapper_folder, "gradle-wrapper.jar");
+    await add_static_file_to_folder(gradle_wrapper_folder, "gradle-wrapper.jar", "application/java-archive");
     gradle_wrapper_folder.file("gradle-wrapper.properties", generate_gradle_wrapper_properties(gradle_version));
 
     const main_folder = zip.folder("src/main");
@@ -169,7 +169,7 @@ export function gen_prj_zip(
     }
 
     const mod_assets_folder = resources_folder.folder(`assets/${archive_name}`);
-    add_static_file_to_folder(mod_assets_folder, "icon.png");
+    await add_static_file_to_folder(mod_assets_folder, "icon.png", "image.png");
 
     return zip;
 }
