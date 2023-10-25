@@ -139,6 +139,17 @@ archives_base_name = ${archive_name}
 }
 
 /**
+ * @param {string} mod_name 
+ * @returns {string} the content of the README.md file
+ */
+export function generate_readme_md(mod_name) {
+    return `# ${mod_name}
+
+This template was generated using c-leri's [Quilt Template Mod Generator](https://c-leri.github.io/quilt-template-mod-generator/)
+`;
+}
+
+/**
  * @param {string} minecraft_version 
  * @param {string} quilt_mappings_version 
  * @param {string} quilt_loader_version 
@@ -260,43 +271,35 @@ export function generate_java_client(
     env
 ) {
     const initializer_import = use_qfapi
-        ? `import org.quiltmc.loader.api.ModContainer;
-import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;\n`
+        ? `\nimport org.quiltmc.loader.api.ModContainer;
+import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;${env !== "client" ? "\n" : ""}`
+        : "";
+
+    const logger_import = env === "client"
+        ? "\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n"
         : "";
     
     const initializer_implement = use_qfapi
         ? "implements ClientModInitializer "
         : "";
 
-    const initializer_override = use_qfapi
-        ? "\n\n\t@Override\n\tpublic void onInitializeClient(ModContainer mod) {}"
-        : "";
-
-    const initializer_override_client_only = use_qfapi
-        ? `\n\n\t@Override
-\tpublic void onInitializeClient(ModContainer mod) {
-\t\tLOGGER.info("Hello Quilt world from {}!", mod.metadata().name());
-\t}`
-        : "";
-
-    if (env === "client") {
-        return `package ${group_id}.${mod_id}.client;
-
-${initializer_import}import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public class ${mod_name.replaceAll(" ", "")}Client ${initializer_implement}{
-\t// This logger is used to write text to the console and the log file.
+    const logger_declaration = env === "client"
+        ? `\t// This logger is used to write text to the console and the log file.
 \t// It is considered best practice to use your mod name as the logger's name.
 \t// That way, it's clear which mod wrote info, warnings, and errors.
-\tpublic static final Logger LOGGER = LoggerFactory.getLogger("${mod_name}");${initializer_override_client_only}
-}
-`
-    } else return `package ${group_id}.${mod_id}.client;
+\tpublic static final Logger LOGGER = LoggerFactory.getLogger("${mod_name}");\n${use_qfapi ? "\n" : ""}`
+        : "";
 
-${initializer_import}
-public class ${mod_name.replaceAll(" ", "")}Client ${initializer_implement}{${initializer_override}
-}
+    const initializer_override = use_qfapi
+        ? `\t@Override
+\tpublic void onInitializeClient(ModContainer mod) {${env === "client" ? '\n\t\tLOGGER.info("Hello Quilt world from {}!", mod.metadata().name());' : ""}
+\t}\n`
+        : "";
+
+        return `package ${group_id}.${mod_id}.client;
+${initializer_import}${logger_import}
+public class ${mod_name.replaceAll(" ", "")}Client ${initializer_implement}{
+${logger_declaration}${initializer_override}}
 `;
 }
 
@@ -316,15 +319,15 @@ export function generate_java_mixin(
     return `package ${group_id}.${mod_id}.mixin;
 
 import ${group_id}.${mod_id}.${env === "client" ? "client." + mod_name.replaceAll(" ", "") + "Client" : mod_name.replaceAll(" ", "")};
-import net.minecraft.client.gui.screen.TitleScreen;
+${env === "server" ? "import net.minecraft.server.MinecraftServer;" : "import net.minecraft.client.gui.screen.TitleScreen;"}
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(TitleScreen.class)
-public class TitleScreenMixin {
-\t@Inject(method = "init", at = @At("TAIL"))
+@Mixin(${env === "server" ? "MinecraftServer" : "TitleScreen"}.class)
+public class ${env === "server" ? "MinecraftServer" : "TitleScreen"}Mixin {
+\t@Inject(method = "${env === "server" ? "loadWorld" : "init"}", at = @At("TAIL"))
 \tpublic void onInit(CallbackInfo ci) {
 \t\t${env === "client" ? mod_name.replaceAll(" ", "") + "Client" : mod_name.replaceAll(" ", "")}.LOGGER.info("This line is printed by a mixin of ${mod_name}!");
 \t}
@@ -354,7 +357,7 @@ export function generate_quilt_mod_json(
     group_id,
     mod_id,
     mod_name,
-    description,
+    description_content,
     author,
     homepage,
     issues,
@@ -385,6 +388,39 @@ export function generate_quilt_mod_json(
         entrypoints += '\t\t},';
     }
 
+    let contact = "";
+    if (homepage || issues || sources) {
+        contact = '\n\t\t\t"contact": {';
+
+        if (description) {
+            contact += `\n\t\t\t\t"homepage": "${homepage}"${issues || sources ? "," : ""}`;
+        }
+
+        if (issues) {
+            contact += `\n\t\t\t\t"issues": "${issues}"${sources ? "," : ""}`;
+        }
+
+        if (sources) {
+            contact += `\n\t\t\t\t"sources": "${sources}"`
+        }
+
+        contact += '\n\t\t\t},'
+    }
+
+    const description = description_content
+        ? `\n\t\t\t"description": "${description_content}",`
+        : "";
+
+    const contributors = author
+        ? `\n\t\t\t"contributors": {
+\t\t\t\t"${author}": "Owner"
+\t\t\t},`
+        : "";
+
+    const license = license_spdx_id
+            ? `\n\t\t\t"license": "${license_spdx_id}",`
+            : "";
+
     const qfapi = use_qfapi
         ? `\n\t\t\t{
 \t\t\t\t"id": "quilted_fabric_api",
@@ -393,7 +429,7 @@ export function generate_quilt_mod_json(
         : "";
 
     const mixin = use_mixins
-        ? `,\n\t"mixin": "${mod_id}.mixins.json"`
+        ? `\n\t"mixin": "${mod_id}.mixins.json",`
         : "";
 
     return `{
@@ -403,16 +439,7 @@ export function generate_quilt_mod_json(
 \t\t"id": "${mod_id}",
 \t\t"version": "\${version}",
 \t\t"metadata": {
-\t\t\t"name": "${mod_name}",
-\t\t\t"description": "${description}",
-\t\t\t"contributors": {
-\t\t\t\t"${author}": "Owner"
-\t\t\t},
-\t\t\t"contact": {
-\t\t\t\t"homepage": "${homepage}",
-\t\t\t\t"issues": "${issues}",
-\t\t\t\t"sources": "${sources}"
-\t\t\t},${license_spdx_id ? `\n\t\t\t"license": "${license_spdx_id}",` : ""}
+\t\t\t"name": "${mod_name}",${description}${contact}${contributors}${license}
 \t\t\t"icon": "assets/${mod_id}/icon.png"
 \t\t},
 \t\t"intermediate_mappings": "net.fabricmc:intermediary",${entrypoints}
@@ -426,7 +453,10 @@ export function generate_quilt_mod_json(
 \t\t\t\t"versions": "~${minecraft_version}"
 \t\t\t}
 \t\t]
-\t}${mixin}
+\t},${mixin}
+\t"minecraft": {
+\t\t"environment": "${env === "both" ? "*" : env === "server" ? "dedicated_server" : "client"}"
+\t}
 }
 `;
 }
@@ -434,18 +464,18 @@ export function generate_quilt_mod_json(
 /**
  * @param {string} mod_id 
  * @param {string} group_id 
+ * @param {"client"|"both"|"server"} env 
  * @returns {string} the content of the <MOD_ID>.mixins.json file
  */
-export function generate_mixins_json(mod_id, group_id) {
+export function generate_mixins_json(mod_id, group_id, env) {
     return `{
   "required": true,
   "minVersion": "0.8",
   "package": "${group_id}.${mod_id}.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [],
-  "client": [
-    "TitleScreenMixin"
-  ],
+  "client": [${env !== "server" ? '\n    "TitleScreenMixin"\n  ' : ""}],
+  "server": [${env === "server" ? '\n    "MinecraftServerMixin"\n  ' : ""}],
   "injectors": {
     "defaultRequire": 1
   }

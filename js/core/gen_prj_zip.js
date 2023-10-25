@@ -11,7 +11,8 @@ import {
     generate_quilt_mod_json,
     generate_mixins_json,
     generate_build_gradle,
-    generate_mit_license
+    generate_mit_license,
+    generate_readme_md
 } from "./gen_files_content.js";
 
 /**
@@ -111,6 +112,7 @@ export function gen_prj_zip(
 
     zip.file("build.gradle", generate_build_gradle(archive_name, use_qfapi));
     zip.file("gradle.properties", generate_gradle_properties(mod_version, group_id, archive_name));
+    zip.file("README.md", generate_readme_md(mod_name));
 
     const gradle_folder = zip.folder("gradle");
     gradle_folder.file(
@@ -137,7 +139,7 @@ export function gen_prj_zip(
 
     if (use_mixins) {
         const mixin_package = mod_package.folder("mixin");
-        mixin_package.file("TitleScreenMixin.java", generate_java_mixin(archive_name, group_id, mod_name, env))
+        mixin_package.file(`${env === "server" ? "MinecraftServerMixin" : "TitleScreenMixin"}.java`, generate_java_mixin(archive_name, group_id, mod_name, env))
     }
 
     const resources_folder = main_folder.folder("resources");
@@ -163,7 +165,7 @@ export function gen_prj_zip(
     );
 
     if (use_mixins) {
-        resources_folder.file(`${archive_name}.mixins.json`, generate_mixins_json(archive_name, group_id));
+        resources_folder.file(`${archive_name}.mixins.json`, generate_mixins_json(archive_name, group_id, env));
     }
 
     const mod_assets_folder = resources_folder.folder(`assets/${archive_name}`);
