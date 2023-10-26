@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { Writable } from 'svelte/store';
+	import { readable, type Readable, type Writable } from 'svelte/store';
 
 	export let label: string;
 	export let placeholder: string;
-	export let help: string | undefined = undefined;
+	export let error: Readable<boolean> = readable(false);
 	export let value: Writable<string>;
 
 	const id = crypto.randomUUID();
@@ -14,9 +14,9 @@
 	<div class="control">
 		<textarea {id} class="textarea is-medium" {placeholder} bind:value={$value} />
 	</div>
-	{#if help}
-		<p class="help is-medium">{help}</p>
-	{/if}
+	<p class={$error ? 'help is-medium is-danger' : 'help is-medium'}>
+		<slot />
+	</p>
 </div>
 
 <style>
