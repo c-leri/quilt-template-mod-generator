@@ -12,9 +12,14 @@
 <div class="field">
 	<label for={id} class="label is-medium">{label}</label>
 	<div class="control">
-		<textarea {id} class="textarea is-medium" {placeholder} bind:value={$value} />
+		<textarea
+			{id}
+			class="textarea is-medium {$error ? 'is-danger' : ''}"
+			{placeholder}
+			bind:value={$value}
+		/>
 	</div>
-	<p class={$error ? 'help is-medium is-danger' : 'help is-medium'}>
+	<p class="help is-medium {$error ? 'is-danger' : ''}">
 		<slot />
 	</p>
 </div>

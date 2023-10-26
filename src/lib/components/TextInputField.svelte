@@ -12,9 +12,15 @@
 <div class="field">
 	<label for={id} class="label is-medium">{label}</label>
 	<div class="control">
-		<input {id} class="input is-medium" type="text" {placeholder} bind:value={$value} />
+		<input
+			{id}
+			class="input is-mediu {$error ? 'is-danger' : ''}"
+			type="text"
+			{placeholder}
+			bind:value={$value}
+		/>
 	</div>
-	<p class={$error ? 'help is-medium is-danger' : 'help is-medium'}>
+	<p class="help is-medium {$error ? 'is-danger' : ''}">
 		<slot />
 	</p>
 </div>

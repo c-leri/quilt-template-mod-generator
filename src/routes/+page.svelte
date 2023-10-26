@@ -1,16 +1,11 @@
 <script lang="ts">
 	import {
 		GENERIC_JSON_INVALID_CHARACTERS,
-		GENERIC_JSON_VALIDATOR,
-		GROUP_ID_VALIDATOR,
 		GROUP_ID_VALID_CHARACTERS,
-		MOD_ID_VALIDATOR,
 		MOD_ID_VALID_CHARACTERS,
-		MOD_VERSION_VALIDATOR,
 		MOD_VERSION_VALID_CHARACTERS,
-		URL_PATTERN,
-		URL_VALIDATOR
-	} from '$lib/FIeldValidators';
+		URL_PATTERN
+	} from '$lib/constants/field_validators';
 	import CheckboxField from '$lib/components/CheckboxField.svelte';
 	import SelectField from '$lib/components/SelectField.svelte';
 	import TextAreaField from '$lib/components/TextAreaField.svelte';
@@ -21,120 +16,106 @@
 		get_quilt_loader_versions,
 		get_quilt_mappings_versions
 	} from '$lib/get_versions';
-	import type { Option } from '$lib/types';
-	import { onMount } from 'svelte';
+	import type { SelectOption } from '$lib/types';
+	import { onDestroy, onMount } from 'svelte';
 	import { readable, writable, type Writable } from 'svelte/store';
+	import {
+		mod_name,
+		mod_id,
+		group_id,
+		mod_version,
+		author,
+		description,
+		homepage_url,
+		source_url,
+		issues_url,
+		is_minecraft_stable,
+		minecraft_version,
+		quilt_loader_version,
+		quilt_mappings_version,
+		use_qsl_qfapi,
+		qsl_qfapi_version,
+		mod_environment,
+		use_mixins,
+		license
+	} from '$lib/stores/field_values';
+	import {
+		is_mod_name_error,
+		is_mod_id_error,
+		is_group_id_error,
+		is_mod_version_error,
+		is_author_error,
+		is_description_error,
+		is_homepage_url_error,
+		is_source_url_error,
+		is_issues_url_error,
+		is_minecraft_version_error,
+		is_quilt_loader_version_error,
+		is_quilt_mappings_version_error,
+		is_qsl_qfapi_version_error
+	} from '$lib/stores/field_errors';
+	import type { Unsubscriber } from 'svelte/motion';
+	import { licenses, mod_environments } from '$lib/constants/field_options';
+	import { generate_template } from '$lib/generate_template';
 
-	// Mod Name Input
-	const mod_name: Writable<string> = writable();
-	const is_mod_name_error: Writable<boolean> = writable(false);
-	mod_name.subscribe(
-		(mod_name) =>
-			($is_mod_name_error = mod_name !== undefined && GENERIC_JSON_VALIDATOR.test(mod_name))
-	);
+	const unsubscribers: Unsubscriber[] = [];
 
-	// Mod ID Input
-	const mod_id: Writable<string> = writable();
-	const is_mod_id_error: Writable<boolean> = writable(false);
-	mod_id.subscribe(
-		(mod_id) => ($is_mod_id_error = mod_id !== undefined && MOD_ID_VALIDATOR.test(mod_id))
-	);
+	const minecraft_versions: Writable<SelectOption[]> = writable([]);
+	const quilt_loader_versions: Writable<SelectOption[]> = writable([]);
+	const quilt_mappings_versions: Writable<SelectOption[]> = writable([]);
+	const qsl_qfapi_versions: Writable<SelectOption[]> = writable([]);
 
-	// Group ID Input
-	const group_id: Writable<string> = writable();
-	const is_group_id_error: Writable<boolean> = writable(false);
-	group_id.subscribe(
-		(group_id) => ($is_group_id_error = group_id !== undefined && GROUP_ID_VALIDATOR.test(group_id))
-	);
+	onMount(async () => {
+		unsubscribers.push(
+			is_minecraft_stable.subscribe((is_minecraft_stable) =>
+				get_minecraft_versions(is_minecraft_stable)
+					.then((minecraft_versions) => {
+						$minecraft_versions = minecraft_versions;
+						$is_minecraft_version_error = false;
+					})
+					.catch(() => ($is_minecraft_version_error = true))
+			)
+		);
 
-	// Mod Version Input
-	const mod_version: Writable<string> = writable();
-	const is_mod_version_error: Writable<boolean> = writable(false);
-	mod_version.subscribe(
-		(mod_version) =>
-			($is_mod_version_error = mod_version !== undefined && MOD_VERSION_VALIDATOR.test(mod_version))
-	);
+		unsubscribers.push(
+			minecraft_version.subscribe((minecraft_version) => {
+				if (minecraft_version) {
+					get_quilt_loader_versions(minecraft_version)
+						.then((quilt_loader_versions) => {
+							$quilt_loader_versions = quilt_loader_versions;
+							$is_quilt_loader_version_error = false;
+						})
+						.catch(() => ($is_quilt_loader_version_error = true));
 
-	// Mod Environment Select
-	const mod_environment: Writable<string> = writable();
+					get_quilt_mappings_versions(minecraft_version)
+						.then((quilt_mappings_versions) => {
+							$quilt_mappings_versions = quilt_mappings_versions;
+							$is_quilt_mappings_version_error = false;
+						})
+						.catch(() => ($is_quilt_mappings_version_error = true));
 
-	// Minecraft Version Select
-	const minecraft_versions: Writable<Option[]> = writable([]);
-	const minecraft_version: Writable<string> = writable();
-	const is_minecraft_version_error: Writable<boolean> = writable(false);
+					get_qsl_qfapi_versions(minecraft_version)
+						.then((qsl_qfapi_versions) => {
+							$qsl_qfapi_versions = qsl_qfapi_versions;
+							$is_qsl_qfapi_version_error = false;
+						})
+						.catch(() => ($is_qsl_qfapi_version_error = true));
+				} else {
+					$quilt_loader_versions = [];
+					$quilt_mappings_versions = [];
+					$qsl_qfapi_versions = [];
+				}
+			})
+		);
+	});
 
-	// Minecraft Stable Checkbox
-	const is_minecraft_stable: Writable<boolean> = writable(true);
-
-	// Quilt Loader Version Select
-	const quilt_loader_versions: Writable<Option[]> = writable([]);
-	const quilt_loader_version: Writable<string> = writable();
-	const is_quilt_loader_version_error: Writable<boolean> = writable(false);
-
-	// Quilt Mappings Version Select
-	const quilt_mappings_versions: Writable<Option[]> = writable([]);
-	const quilt_mappings_version: Writable<string> = writable();
-	const is_quilt_mappings_version_error: Writable<boolean> = writable(false);
-
-	// Use QSL/QFAPI Checkbox
-	const use_qsl_qfapi: Writable<boolean> = writable(true);
-
-	// QSL/QFAPI Version Select
-	const qsl_qfapi_versions: Writable<Option[]> = writable([]);
-	const qsl_qfapi_version: Writable<string> = writable();
-	const is_qsl_qfapi_version_error: Writable<boolean> = writable(false);
-
-	// Use Mixins Checkbox
-	const use_mixins: Writable<boolean> = writable(true);
-
-	// Author Input
-	const author: Writable<string> = writable();
-	const is_author_error: Writable<boolean> = writable(false);
-	author.subscribe(
-		(author) => ($is_author_error = author !== undefined && GENERIC_JSON_VALIDATOR.test(author))
-	);
-
-	// Description TextArea
-	const description: Writable<string> = writable();
-	const is_description_error: Writable<boolean> = writable(false);
-	description.subscribe(
-		(description) =>
-			($is_description_error =
-				description !== undefined && GENERIC_JSON_VALIDATOR.test(description))
-	);
-
-	// License Select
-	const license: Writable<string> = writable();
-
-	// Homepage URL Input
-	const homepage_url: Writable<string> = writable();
-	const is_homepage_url_error: Writable<boolean> = writable(false);
-	homepage_url.subscribe(
-		(homepage_url) =>
-			($is_homepage_url_error = homepage_url !== undefined && !URL_VALIDATOR.test(homepage_url))
-	);
-
-	// Source Repository URL Input
-	const source_url: Writable<string> = writable();
-	const is_source_url_error: Writable<boolean> = writable(false);
-	source_url.subscribe(
-		(source_url) =>
-			($is_source_url_error = source_url !== undefined && !URL_VALIDATOR.test(source_url))
-	);
-
-	// Issues Tracker URL Input
-	const issues_url: Writable<string> = writable();
-	const is_issues_url_error: Writable<boolean> = writable(false);
-	issues_url.subscribe(
-		(issues_url) =>
-			($is_issues_url_error = issues_url !== undefined && !URL_VALIDATOR.test(issues_url))
-	);
+	onDestroy(() => unsubscribers.forEach((unsubscriber) => unsubscriber));
 
 	// prettier-ignore
 	// Generate button
 	$: is_generate_button_disabled =
-		(!$mod_name || $is_mod_name_error) ||
-		(!$mod_id || $is_mod_id_error) ||
+		!$mod_name || $is_mod_name_error ||
+		!$mod_id || $is_mod_id_error ||
 		!$group_id || $is_group_id_error ||
 		!$mod_version || $is_mod_version_error ||
 		!$minecraft_version ||
@@ -146,40 +127,6 @@
 		$is_homepage_url_error ||
 		$is_source_url_error ||
 		$is_issues_url_error;
-
-	onMount(async () => {
-		is_minecraft_stable.subscribe((is_minecraft_stable) =>
-			get_minecraft_versions(is_minecraft_stable)
-				.then((minecraft_versions) => {
-					$minecraft_versions = minecraft_versions;
-					$is_minecraft_version_error = false;
-				})
-				.catch(() => ($is_minecraft_version_error = true))
-		);
-
-		minecraft_version.subscribe((minecraft_version) => {
-			get_quilt_loader_versions(minecraft_version)
-				.then((quilt_loader_versions) => {
-					$quilt_loader_versions = quilt_loader_versions;
-					$is_quilt_loader_version_error = false;
-				})
-				.catch(() => ($is_quilt_loader_version_error = true));
-
-			get_quilt_mappings_versions(minecraft_version)
-				.then((quilt_mappings_versions) => {
-					$quilt_mappings_versions = quilt_mappings_versions;
-					$is_quilt_mappings_version_error = false;
-				})
-				.catch(() => ($is_quilt_mappings_version_error = true));
-
-			get_qsl_qfapi_versions(minecraft_version)
-				.then((qsl_qfapi_versions) => {
-					$qsl_qfapi_versions = qsl_qfapi_versions;
-					$is_qsl_qfapi_version_error = false;
-				})
-				.catch(() => ($is_qsl_qfapi_version_error = true));
-		});
-	});
 </script>
 
 <svelte:head>
@@ -236,15 +183,7 @@
 			{/if}
 		</TextInputField>
 
-		<SelectField
-			label="Environment"
-			options={readable([
-				{ name: 'Both', value: 'both' },
-				{ name: 'Client', value: 'client' },
-				{ name: 'Server', value: 'server' }
-			])}
-			value={mod_environment}
-		/>
+		<SelectField label="Environment" options={readable(mod_environments)} value={mod_environment} />
 	</section>
 
 	<section class="section">
@@ -343,19 +282,7 @@
 			{/if}
 		</TextAreaField>
 
-		<SelectField
-			label="License"
-			options={readable([
-				{ name: 'No License', value: '' },
-				{ name: 'The Unlicense', value: 'Unlicense' },
-				{ name: 'Creative Commons Zero', value: 'CC0-1.0' },
-				{ name: 'GNU Lesser General Public License v3.0', value: 'LGPL-3.0-only' },
-				{ name: 'MIT License', value: 'MIT' },
-				{ name: 'Apache License 2.0', value: 'Apache-2.0' },
-				{ name: 'Mozilla Public License 2.0', value: 'MPL-2.0' }
-			])}
-			value={license}
-		>
+		<SelectField label="License" options={readable(licenses)} value={license}>
 			If you don't know what license to choose, you can use
 			<a href="https://choosealicense.com/">this tool</a>
 		</SelectField>
@@ -398,7 +325,11 @@
 	</section>
 
 	<div class="is-flex is-justify-content-center mb-6">
-		<button class="button is-primary is-medium" disabled={is_generate_button_disabled}>
+		<button
+			on:click={generate_template}
+			class="button is-primary is-medium"
+			disabled={is_generate_button_disabled}
+		>
 			Generate Template
 		</button>
 	</div>
