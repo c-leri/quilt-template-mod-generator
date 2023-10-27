@@ -1,0 +1,117 @@
+{
+	"title": "Générateur de Patron de Mod Quilt",
+	"mod_configuration": {
+		"title": "Configuration du Mod",
+		"mod_name": {
+			"label": "Nom du Mod",
+			"placeholder": "Example Mod",
+			"error": "Le nom du mod ne peut pas contenir les caractères suivants : `{}`"
+		},
+		"mod_id": {
+			"label": "ID du Mod",
+			"placeholder": "example_mod",
+			"error": "L'id du mod ne peut contenir que les caractères suivants : `{}`"
+		},
+		"group_id": {
+			"label": "ID du Groupe",
+			"placeholder": "net.example",
+			"error": "L'id du groupe ne peut contenir que les caractères suivants : `{}`",
+			"help": "Si vous n'êtes pas sûr de l'ID de groupe à utiliser et que vous planifiez d'héberger le code source du mod sur Github, utilisez `io.github.<VOTRE_PSEUDO>`"
+		},
+		"mod_version": {
+			"label": "Version du Mod",
+			"placeholder": "0.0.1",
+			"error": "La version du mod ne peut contenir que les caractères suivants : `{}`"
+		},
+		"mod_environment": {
+			"label": "Environnement",
+			"keys": {
+				"client": "Client",
+				"both": "Les Deux",
+				"server": "Serveur"
+			}
+		}
+	},
+	"dependencies_configuration": {
+		"title": "Configuration des Dépendances",
+		"minecraft_version": {
+			"label": "Version de Minecraft",
+			"error": "Impossible de récupérer les versions de Minecraft, veuillez réessayer plus tard"
+		},
+		"minecraft_stable": {
+			"label": "Stable ?"
+		},
+		"quilt_loader_version": {
+			"label": "Version du Quilt Loader",
+			"error": {
+				"with_minecraft_version": "Impossible de récupérer les versions du Quilt Loader pour Minecraft version {}",
+				"without_minecraft_version": "Impossible de récupérer les versions du Quilt Loader pour cette version de Minecraft"
+			},
+			"no_versions": {
+				"with_minecraft_version": "Aucune version du Quilt Loader n'a été trouvée pour Minecraft version {}",
+				"without_minecraft_version": "Aucune version du Quilt Loader n'a été trouvée pour cette version de Minecraft"
+			}
+		},
+		"quilt_mappings_version": {
+			"label": "Version des Mappings Quilt",
+			"error": {
+				"with_minecraft_version": "Impossible de récupérer les versions des Mappings Quilt pour Minecraft version {}",
+				"without_minecraft_version": "Impossible de récupérer les versions des Mappings Quilt pour cette version de Minecraft"
+			},
+			"no_versions": {
+				"with_minecraft_version": "Aucune version des Mappings Quilt n'a été trouvée pour Minecraft version {}",
+				"without_minecraft_version": "Aucune version des Mappings Quilt n'a été trouvée pour cette version de Minecraft"
+			}
+		},
+		"use_qsl_qfapi": {
+			"label": "Utiliser QSL/QSFAPI ?"
+		},
+		"qsl_qfapi_version": {
+			"label": "Version de QSL/QFAPI",
+			"error": {
+				"with_minecraft_version": "Impossible de récupérer les versions de QSL/QFAPI pour Minecraft version {}",
+				"without_minecraft_version": "Impossible de récupérer les versions de QSL/QFAPI pour cette version de Minecraft"
+			},
+			"no_versions": {
+				"with_minecraft_version": "Aucune version de QSL/QFAPI n'a été trouvée pour Minecraft version {}",
+				"without_minecraft_version": "Aucune version de QSL/QFAPI n'a été trouvée pour cette version de Minecraft"
+			}
+		},
+		"use_mixins": {
+			"label": "Utiliser des Mixins ?"
+		}
+	},
+	"optional_metadata": {
+		"title": "Métadonnées Optionnelles",
+		"author": {
+			"label": "Auteur",
+			"placeholder": "C'est vous !",
+			"error": "Votre nom de peut pas contenir les caractères suivants : `{}`"
+		},
+		"description": {
+			"label": "Description",
+			"placeholder": "Une courte description du mod.",
+			"error": "La description du mod ne peut contenir les caractères suivants : `{}`"
+		},
+		"license": {
+			"label": "License",
+			"help": "Si vous ne savez pas quelle license choisir, vous pouvez utiliser [cet outil]({})"
+		},
+		"homepage_url": {
+			"label": "URL du Site Web du Mod",
+			"placeholder": "https://example.com",
+			"error": "L'URL du site web du mod doit correspondre au pattern suivant : `{}`"
+		},
+		"source_url": {
+			"label": "URL du Dépôt Source",
+			"placeholder": "https://github.com/your-name/example-mod",
+			"error": "L'URL du site web du mod doit correspondre au pattern suivant : `{}`"
+		},
+		"issues_url": {
+			"label": "URL du Tracker de Bugs",
+			"placeholder": "https://github.com/your-name/example-mod/issues",
+			"error": "L'URL du tracker de bugs du mod doit correspondre au pattern suivant : `{}`"
+		}
+	},
+	"generate_template_button": "Générer le Patron"
+}
