@@ -2,18 +2,21 @@
 	import type { SelectOption } from '$lib/types';
 	import { readable, type Readable, type Writable } from 'svelte/store';
 	import { _ } from 'svelte-i18n';
+	import { onDestroy } from 'svelte';
 
 	export let label: string;
 	export let options: Readable<SelectOption[]>;
 	export let error: Readable<boolean> = readable(false);
 	export let value: Writable<string>;
-	options.subscribe((options) => {
+	const unsubscriber = options.subscribe((options) => {
 		if (options.length) {
 			if (!$value || !options.find((option) => option.value === $value || option.name === $value)) {
 				$value = options[0].value !== undefined ? options[0].value : options[0].name;
 			}
 		}
 	});
+
+	onDestroy(unsubscriber);
 
 	const id = crypto.randomUUID();
 </script>

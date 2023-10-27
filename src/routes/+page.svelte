@@ -1,4 +1,5 @@
 <script lang="ts">
+	import snarkdown from 'snarkdown';
 	import { _ } from 'svelte-i18n';
 	import {
 		GENERIC_JSON_INVALID_CHARACTERS,
@@ -110,7 +111,7 @@
 		);
 	});
 
-	onDestroy(() => unsubscribers.forEach((unsubscriber) => unsubscriber));
+	onDestroy(() => unsubscribers.forEach((unsubscriber) => unsubscriber()));
 
 	// prettier-ignore
 	// Generate button
@@ -145,8 +146,9 @@
 			value={mod_name}
 		>
 			{#if $is_mod_name_error}
-				{$_('mod_configuration.mod_name.error')}
-				<code>{GENERIC_JSON_INVALID_CHARACTERS}</code>
+				{@html snarkdown(
+					$_('mod_configuration.mod_name.error').replace('{}', GENERIC_JSON_INVALID_CHARACTERS)
+				)}
 			{/if}
 		</TextInputField>
 
@@ -157,8 +159,9 @@
 			value={mod_id}
 		>
 			{#if $is_mod_id_error}
-				{$_('mod_configuration.mod_id.error')}
-				<code>{MOD_ID_VALID_CHARACTERS}</code>
+				{@html snarkdown(
+					$_('mod_configuration.mod_id.error').replace('{}', MOD_ID_VALID_CHARACTERS)
+				)}
 			{/if}
 		</TextInputField>
 
@@ -169,11 +172,11 @@
 			value={group_id}
 		>
 			{#if $is_group_id_error}
-				{$_('mod_configuration.group_id.error')}
-				<code>{GROUP_ID_VALID_CHARACTERS}</code>
+				{@html snarkdown(
+					$_('mod_configuration.group_id.error').replace('{}', GROUP_ID_VALID_CHARACTERS)
+				)}
 			{:else}
-				{$_('mod_configuration.group_id.help')}
-				<code>io.github.&lt;YOUR_USERNAME&gt;</code>
+				{@html snarkdown($_('mod_configuration.group_id.help'))}
 			{/if}
 		</TextInputField>
 
@@ -184,8 +187,9 @@
 			value={mod_version}
 		>
 			{#if $is_mod_version_error}
-				{$_('mod_configuration.mod_version.error')}
-				<code>{MOD_VERSION_VALID_CHARACTERS}</code>
+				{@html snarkdown(
+					$_('mod_configuration.mod_version.error').replace('{}', MOD_VERSION_VALID_CHARACTERS)
+				)}
 			{/if}
 		</TextInputField>
 
@@ -223,15 +227,15 @@
 		>
 			{#if $is_quilt_loader_version_error}
 				{$minecraft_version
-					? `${$_(
+					? $_(
 							'dependencies_configuration.quilt_loader_version.error.with_minecraft_version'
-					  )} ${$minecraft_version}`
+					  ).replace('{}', $minecraft_version)
 					: $_('dependencies_configuration.quilt_loader_version.error.without_minecraft_version')}
 			{:else if !$quilt_loader_versions.length}
 				{$minecraft_version
-					? `${$_(
+					? $_(
 							'dependencies_configuration.quilt_loader_version.no_versions.with_minecraft_version'
-					  )} ${$minecraft_version}`
+					  ).replace('{}', $minecraft_version)
 					: $_(
 							'dependencies_configuration.quilt_loader_version.no_versions.without_minecraft_version'
 					  )}
@@ -246,15 +250,15 @@
 		>
 			{#if $is_quilt_mappings_version_error}
 				{$minecraft_version
-					? `${$_(
+					? $_(
 							'dependencies_configuration.quilt_mappings_version.error.with_minecraft_version'
-					  )} ${$minecraft_version}`
+					  ).replace('{}', $minecraft_version)
 					: $_('dependencies_configuration.quilt_mappings_version.error.without_minecraft_version')}
 			{:else if !$quilt_mappings_versions.length}
 				{$minecraft_version
-					? `${$_(
+					? $_(
 							'dependencies_configuration.quilt_mappings_version.no_versions.with_minecraft_version'
-					  )} ${$minecraft_version}`
+					  ).replace('{}', $minecraft_version)
 					: $_(
 							'dependencies_configuration.quilt_mappings_version.no_versions.without_minecraft_version'
 					  )}
@@ -275,15 +279,15 @@
 			>
 				{#if $is_qsl_qfapi_version_error}
 					{$minecraft_version
-						? `${$_(
+						? $_(
 								'dependencies_configuration.qsl_qfapi_version.error.with_minecraft_version'
-						  )} ${$minecraft_version}`
+						  ).replace('{}', $minecraft_version)
 						: $_('dependencies_configuration.qsl_qfapi_version.error.without_minecraft_version')}
 				{:else if !$qsl_qfapi_versions.length}
 					{$minecraft_version
-						? `${$_(
+						? $_(
 								'dependencies_configuration.qsl_qfapi_version.no_versions.with_minecraft_version'
-						  )} ${$minecraft_version}`
+						  ).replace('{}', $minecraft_version)
 						: $_(
 								'dependencies_configuration.qsl_qfapi_version.no_versions.without_minecraft_version'
 						  )}
@@ -304,8 +308,9 @@
 			value={author}
 		>
 			{#if $is_author_error}
-				{$_('optional_metadata.author.error')}
-				<code>{GENERIC_JSON_INVALID_CHARACTERS}</code>
+				{@html snarkdown(
+					$_('optional_metadata.author.error').replace('{}', GENERIC_JSON_INVALID_CHARACTERS)
+				)}
 			{/if}
 		</TextInputField>
 
@@ -316,8 +321,9 @@
 			value={description}
 		>
 			{#if $is_description_error}
-				{$_('optional_metadata.description.error')}
-				<code>{GENERIC_JSON_INVALID_CHARACTERS}</code>
+				{@html snarkdown(
+					$_('optional_metadata.description.error').replace('{}', GENERIC_JSON_INVALID_CHARACTERS)
+				)}
 			{/if}
 		</TextAreaField>
 
@@ -326,8 +332,9 @@
 			options={readable(licenses)}
 			value={license}
 		>
-			{$_('optional_metadata.license.help')}
-			<a href="https://choosealicense.com/">{$_('optional_metadata.license.help.tool')}</a>
+			{@html snarkdown(
+				$_('optional_metadata.license.help').replace('{}', 'https://choosealicense.com/')
+			)}
 		</SelectField>
 
 		<TextInputField
@@ -337,8 +344,7 @@
 			value={homepage_url}
 		>
 			{#if $is_homepage_url_error}
-				{$_('optional_metadata.homepage_url.error')}
-				<code>{URL_PATTERN}</code>
+				{@html snarkdown($_('optional_metadata.homepage_url.error').replace('{}', URL_PATTERN))}
 			{/if}
 		</TextInputField>
 
@@ -349,8 +355,7 @@
 			value={source_url}
 		>
 			{#if $is_source_url_error}
-				{$_('optional_metadata.source_url.error')}
-				<code>{URL_PATTERN}</code>
+				{@html snarkdown($_('optional_metadata.source_url.error').replace('{}', URL_PATTERN))}
 			{/if}
 		</TextInputField>
 
@@ -361,8 +366,7 @@
 			value={issues_url}
 		>
 			{#if $is_issues_url_error}
-				{$_('optional_metadata.issues_url.error')}
-				<code>{URL_PATTERN}</code>
+				{@html snarkdown($_('optional_metadata.issues_url.error').replace('{}', URL_PATTERN))}
 			{/if}
 		</TextInputField>
 	</section>
