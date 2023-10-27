@@ -1,5 +1,6 @@
 <script>
 	import { base } from '$app/paths';
+	import { _ } from 'svelte-i18n';
 </script>
 
 <nav class="navbar is-dark" aria-label="main navigation" data-controller="navbar">
@@ -7,7 +8,7 @@
 		<a class="navbar-item navbar-logo" href="{base}/">
 			<img src="https://quiltmc.org/assets/img/logo.svg" alt="Quilt Logo" height="28" width="28" />
 
-			<span class="ml-2">Quilt Template Mod Generator</span>
+			<span class="ml-2">{$_('title')}</span>
 		</a>
 
 		<label class="navbar-burger" for="toggle-navbar" aria-label="menu">

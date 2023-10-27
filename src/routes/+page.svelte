@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { _ } from 'svelte-i18n';
 	import {
 		GENERIC_JSON_INVALID_CHARACTERS,
 		GROUP_ID_VALID_CHARACTERS,
@@ -130,195 +131,237 @@
 </script>
 
 <svelte:head>
-	<title>Quilt Template Mod Generator</title>
+	<title>{$_('title')}</title>
 </svelte:head>
 
 <main>
 	<section class="section">
-		<h1 class="title has-text-centered">Mod Configuration</h1>
+		<h1 class="title has-text-centered">{$_('mod_configuration.title')}</h1>
 
 		<TextInputField
-			label="Mod Name"
-			placeholder="Example Mod"
+			label={$_('mod_configuration.mod_name.label')}
+			placeholder={$_('mod_configuration.mod_name.placeholder')}
 			error={is_mod_name_error}
 			value={mod_name}
 		>
 			{#if $is_mod_name_error}
-				Your mod's name cannot contain the following characters:
+				{$_('mod_configuration.mod_name.error')}
 				<code>{GENERIC_JSON_INVALID_CHARACTERS}</code>
 			{/if}
 		</TextInputField>
 
-		<TextInputField label="Mod Id" placeholder="example_mod" error={is_mod_id_error} value={mod_id}>
+		<TextInputField
+			label={$_('mod_configuration.mod_id.label')}
+			placeholder={$_('mod_configuration.mod_id.placeholder')}
+			error={is_mod_id_error}
+			value={mod_id}
+		>
 			{#if $is_mod_id_error}
-				Your mod id must contain only the following characters:
+				{$_('mod_configuration.mod_id.error')}
 				<code>{MOD_ID_VALID_CHARACTERS}</code>
 			{/if}
 		</TextInputField>
 
 		<TextInputField
-			label="Groupd ID"
-			placeholder="net.example"
+			label={$_('mod_configuration.group_id.label')}
+			placeholder={$_('mod_configuration.group_id.placeholder')}
 			error={is_group_id_error}
 			value={group_id}
 		>
 			{#if $is_group_id_error}
-				Your group id must contain only the following characters:
+				{$_('mod_configuration.group_id.error')}
 				<code>{GROUP_ID_VALID_CHARACTERS}</code>
 			{:else}
-				If you are unsure as to what group ID to use and you are planning to host your mod's source
-				code on Github, use <code>io.github.&lt;YOUR_USERNAME&gt;</code>
+				{$_('mod_configuration.group_id.help')}
+				<code>io.github.&lt;YOUR_USERNAME&gt;</code>
 			{/if}
 		</TextInputField>
 
 		<TextInputField
-			label="Mod Version"
-			placeholder="0.0.1"
+			label={$_('mod_configuration.mod_version.label')}
+			placeholder={$_('mod_configuration.mod_version.placeholder')}
 			error={is_mod_version_error}
 			value={mod_version}
 		>
 			{#if $is_mod_version_error}
-				Your mod's version must only contain the following characters:
+				{$_('mod_configuration.mod_version.error')}
 				<code>{MOD_VERSION_VALID_CHARACTERS}</code>
 			{/if}
 		</TextInputField>
 
-		<SelectField label="Environment" options={readable(mod_environments)} value={mod_environment} />
+		<SelectField
+			label={$_('mod_configuration.mod_environment.label')}
+			options={readable(mod_environments)}
+			value={mod_environment}
+		/>
 	</section>
 
 	<section class="section">
-		<h1 class="title has-text-centered">Dependencies Configuration</h1>
+		<h1 class="title has-text-centered">{$_('dependencies_configuration.title')}</h1>
 
 		<SelectField
-			label="Minecraft Version"
+			label={$_('dependencies_configuration.minecraft_version.label')}
 			options={minecraft_versions}
 			value={minecraft_version}
 			error={is_minecraft_version_error}
 		>
 			{#if $is_minecraft_version_error}
-				Unable to fetch Minecraft versions, please try again later
+				{$_('dependencies_configuration.minecraft_version.error')}
 			{/if}
 		</SelectField>
 
-		<CheckboxField label="Stable ?" checked={is_minecraft_stable} />
+		<CheckboxField
+			label={$_('dependencies_configuration.minecraft_stable.label')}
+			checked={is_minecraft_stable}
+		/>
 
 		<SelectField
-			label="Quilt Loader Version"
+			label={$_('dependencies_configuration.quilt_loader_version.label')}
 			options={quilt_loader_versions}
 			error={is_quilt_loader_version_error}
 			value={quilt_loader_version}
 		>
 			{#if $is_quilt_loader_version_error}
-				Unable to fetch Quilt Loader versions for {$minecraft_version
-					? `Minecraft version ${$minecraft_version}`
-					: 'this Minecraft version'}
+				{$minecraft_version
+					? `${$_(
+							'dependencies_configuration.quilt_loader_version.error.with_minecraft_version'
+					  )} ${$minecraft_version}`
+					: $_('dependencies_configuration.quilt_loader_version.error.without_minecraft_version')}
 			{:else if !$quilt_loader_versions.length}
-				No Quilt Loader versions were found for {$minecraft_version
-					? `Minecraft version ${$minecraft_version}`
-					: 'this Minecraft version'}, your project will be generated without it
+				{$minecraft_version
+					? `${$_(
+							'dependencies_configuration.quilt_loader_version.no_versions.with_minecraft_version'
+					  )} ${$minecraft_version}`
+					: $_(
+							'dependencies_configuration.quilt_loader_version.no_versions.without_minecraft_version'
+					  )}
 			{/if}
 		</SelectField>
 
 		<SelectField
-			label="Quilt Mappings Version"
+			label={$_('dependencies_configuration.quilt_mappings_version.label')}
 			options={quilt_mappings_versions}
 			value={quilt_mappings_version}
 			error={is_quilt_mappings_version_error}
 		>
 			{#if $is_quilt_mappings_version_error}
-				Unable to fetch Quilt Mappings versions for {$minecraft_version
-					? `Minecraft version ${$minecraft_version}`
-					: 'this Minecraft version'}
+				{$minecraft_version
+					? `${$_(
+							'dependencies_configuration.quilt_mappings_version.error.with_minecraft_version'
+					  )} ${$minecraft_version}`
+					: $_('dependencies_configuration.quilt_mappings_version.error.without_minecraft_version')}
 			{:else if !$quilt_mappings_versions.length}
-				No Quilt Mappings versions were found for {$minecraft_version
-					? `Minecraft version ${$minecraft_version}`
-					: 'this Minecraft version'}, your project will be generated without it
+				{$minecraft_version
+					? `${$_(
+							'dependencies_configuration.quilt_mappings_version.no_versions.with_minecraft_version'
+					  )} ${$minecraft_version}`
+					: $_(
+							'dependencies_configuration.quilt_mappings_version.no_versions.without_minecraft_version'
+					  )}
 			{/if}
 		</SelectField>
 
-		<CheckboxField label="Use QSL/QFAPI ?" checked={use_qsl_qfapi} />
+		<CheckboxField
+			label={$_('dependencies_configuration.use_qsl_qfapi.label')}
+			checked={use_qsl_qfapi}
+		/>
 
 		{#if $use_qsl_qfapi}
 			<SelectField
-				label="QSL/QFAPI Version"
+				label={$_('dependencies_configuration.qsl_qfapi_version.label')}
 				options={qsl_qfapi_versions}
 				value={qsl_qfapi_version}
 				error={is_qsl_qfapi_version_error}
 			>
 				{#if $is_qsl_qfapi_version_error}
-					Unable to fetch QSL/QFAPI versions for {$minecraft_version
-						? `Minecraft version ${$minecraft_version}`
-						: 'this Minecraft version'}
+					{$minecraft_version
+						? `${$_(
+								'dependencies_configuration.qsl_qfapi_version.error.with_minecraft_version'
+						  )} ${$minecraft_version}`
+						: $_('dependencies_configuration.qsl_qfapi_version.error.without_minecraft_version')}
 				{:else if !$qsl_qfapi_versions.length}
-					No QSL/QFAPI versions were found for {$minecraft_version
-						? `Minecraft version ${$minecraft_version}`
-						: 'this Minecraft version'}
+					{$minecraft_version
+						? `${$_(
+								'dependencies_configuration.qsl_qfapi_version.no_versions.with_minecraft_version'
+						  )} ${$minecraft_version}`
+						: $_(
+								'dependencies_configuration.qsl_qfapi_version.no_versions.without_minecraft_version'
+						  )}
 				{/if}
 			</SelectField>
 		{/if}
 
-		<CheckboxField label="Use Mixins ?" checked={use_mixins} />
+		<CheckboxField label={$_('dependencies_configuration.use_mixins.label')} checked={use_mixins} />
 	</section>
 
 	<section class="section">
-		<h1 class="title has-text-centered">Optional Mod Metadata</h1>
+		<h1 class="title has-text-centered">{$_('optional_metadata.title')}</h1>
 
-		<TextInputField label="Author" placeholder="That's you" error={is_author_error} value={author}>
+		<TextInputField
+			label={$_('optional_metadata.author.label')}
+			placeholder={$_('optional_metadata.author.placeholder')}
+			error={is_author_error}
+			value={author}
+		>
 			{#if $is_author_error}
-				Your name cannot contain the following characters:
+				{$_('optional_metadata.author.error')}
 				<code>{GENERIC_JSON_INVALID_CHARACTERS}</code>
 			{/if}
 		</TextInputField>
 
 		<TextAreaField
-			label="Description"
-			placeholder="A short description of your mod."
+			label={$_('optional_metadata.description.label')}
+			placeholder={$_('optional_metadata.description.placeholder')}
 			error={is_description_error}
 			value={description}
 		>
 			{#if $is_description_error}
-				Your mod's description cannot contain the following characters:
+				{$_('optional_metadata.description.error')}
 				<code>{GENERIC_JSON_INVALID_CHARACTERS}</code>
 			{/if}
 		</TextAreaField>
 
-		<SelectField label="License" options={readable(licenses)} value={license}>
-			If you don't know what license to choose, you can use
-			<a href="https://choosealicense.com/">this tool</a>
+		<SelectField
+			label={$_('optional_metadata.license.label')}
+			options={readable(licenses)}
+			value={license}
+		>
+			{$_('optional_metadata.license.help')}
+			<a href="https://choosealicense.com/">{$_('optional_metadata.license.help.tool')}</a>
 		</SelectField>
 
 		<TextInputField
-			label="Homepage URL"
-			placeholder="https://example.com"
+			label={$_('optional_metadata.homepage_url.label')}
+			placeholder={$_('optional_metadata.homepage_url.placeholder')}
 			error={is_homepage_url_error}
 			value={homepage_url}
 		>
 			{#if $is_homepage_url_error}
-				Your mod's homepage url must match the following pattern:
+				{$_('optional_metadata.homepage_url.error')}
 				<code>{URL_PATTERN}</code>
 			{/if}
 		</TextInputField>
 
 		<TextInputField
-			label="Source Repository URL"
-			placeholder="https://github.com/your-name/example-mod"
+			label={$_('optional_metadata.source_url.label')}
+			placeholder={$_('optional_metadata.source_url.placeholder')}
 			error={is_source_url_error}
 			value={source_url}
 		>
 			{#if $is_source_url_error}
-				Your mod's source repository url must match the following pattern:
+				{$_('optional_metadata.source_url.error')}
 				<code>{URL_PATTERN}</code>
 			{/if}
 		</TextInputField>
 
 		<TextInputField
-			label="Issue Tracker URL"
-			placeholder="https://github.com/your-name/example-mod/issues"
+			label={$_('optional_metadata.issues_url.label')}
+			placeholder={$_('optional_metadata.issues_url.placeholder')}
 			error={is_issues_url_error}
 			value={issues_url}
 		>
 			{#if $is_issues_url_error}
-				Your mod's issue tracker url must match the following pattern:
+				{$_('optional_metadata.issues_url.error')}
 				<code>{URL_PATTERN}</code>
 			{/if}
 		</TextInputField>
@@ -330,7 +373,7 @@
 			class="button is-primary is-medium"
 			disabled={is_generate_button_disabled}
 		>
-			Generate Template
+			{$_('generate_template_button')}
 		</button>
 	</div>
 </main>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { SelectOption } from '$lib/types';
 	import { readable, type Readable, type Writable } from 'svelte/store';
+	import { _ } from 'svelte-i18n';
 
 	export let label: string;
 	export let options: Readable<SelectOption[]>;
@@ -24,9 +25,11 @@
 			<select {id} bind:value={$value}>
 				{#each $options as option}
 					{#if option.value !== undefined}
-						<option value={option.value}>{option.name}</option>
+						<option value={option.value}>
+							{option.translatable ? $_(option.name) : option.name}
+						</option>
 					{:else}
-						<option>{option.name}</option>
+						<option>{option.translatable ? $_(option.name) : option.name}</option>
 					{/if}
 				{/each}
 			</select>

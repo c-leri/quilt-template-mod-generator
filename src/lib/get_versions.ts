@@ -1,7 +1,7 @@
 import type {
 	GradleVersion,
 	MinecraftVersion,
-	Option,
+	SelectOption,
 	QuiltLoaderVersion,
 	QuiltMappingsVersion
 } from './types';
@@ -11,7 +11,7 @@ const QUILT_META = 'https://meta.quiltmc.org/v3/versions';
 /**
  * @throws {Error}
  */
-export async function get_minecraft_versions(stable: boolean): Promise<Option[]> {
+export async function get_minecraft_versions(stable: boolean): Promise<SelectOption[]> {
 	const url = QUILT_META + '/game';
 	const response = await fetch(url, {
 		method: 'GET',
@@ -38,7 +38,9 @@ export async function get_minecraft_versions(stable: boolean): Promise<Option[]>
 /**
  * @throws {Error}
  */
-export async function get_quilt_loader_versions(minecraft_version: string): Promise<Option[]> {
+export async function get_quilt_loader_versions(
+	minecraft_version: string
+): Promise<SelectOption[]> {
 	if (!minecraft_version) {
 		throw new Error("Can't fetch Quilt Loader vesions without a minecraft version");
 	}
@@ -65,7 +67,9 @@ export async function get_quilt_loader_versions(minecraft_version: string): Prom
 /**
  * @throws {Error}
  */
-export async function get_quilt_mappings_versions(minecraft_version: string): Promise<Option[]> {
+export async function get_quilt_mappings_versions(
+	minecraft_version: string
+): Promise<SelectOption[]> {
 	const url = `${QUILT_META}/quilt-mappings/${minecraft_version}`;
 	const response = await fetch(url, {
 		method: 'GET',
@@ -88,7 +92,7 @@ export async function get_quilt_mappings_versions(minecraft_version: string): Pr
 /**
  * @throws {Error}
  */
-export async function get_qsl_qfapi_versions(minecraft_version: string): Promise<Option[]> {
+export async function get_qsl_qfapi_versions(minecraft_version: string): Promise<SelectOption[]> {
 	if (!minecraft_version) {
 		throw new Error("Can't fetch QSL/QFAPI vesions without a minecraft version");
 	}
@@ -118,7 +122,7 @@ export async function get_qsl_qfapi_versions(minecraft_version: string): Promise
 		.map((version) => {
 			return { name: version!.replace(`-${minecraft_version}`, ''), value: version! };
 		})
-		.toReversed();
+		.reverse();
 }
 
 export async function get_current_gradle_version(): Promise<string> {

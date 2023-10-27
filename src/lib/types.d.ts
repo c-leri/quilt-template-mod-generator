@@ -1,6 +1,7 @@
 export interface SelectOption {
 	name: string;
 	value?: string;
+	translatable?: boolean;
 }
 
 export interface MinecraftVersion {

@@ -1,7 +1,7 @@
 export const mod_environments = [
-	{ name: 'Both', value: 'both' },
-	{ name: 'Client', value: 'client' },
-	{ name: 'Server', value: 'server' }
+	{ name: 'mod_configuration.mod_environment.keys.both', value: 'both', translatable: true },
+	{ name: 'mod_configuration.mod_environment.keys.client', value: 'client', translatable: true },
+	{ name: 'mod_configuration.mod_environment.keys.server', value: 'server', translatable: true }
 ];
 
 export const licenses = [

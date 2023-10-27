@@ -409,7 +409,7 @@ export function generate_quilt_mod_json(): string {
 \t\t]
 \t},${mixin}
 \t"minecraft": {
-\t\t"mod_environment_valueironment": "${
+\t\t"environment": "${
 		mod_environment_value === 'both'
 			? '*'
 			: mod_environment_value === 'server'
