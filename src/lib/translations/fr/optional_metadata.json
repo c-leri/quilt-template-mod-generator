@@ -1,0 +1,32 @@
+{
+	"title": "Métadonnées Optionnelles",
+	"author": {
+		"label": "Auteur",
+		"placeholder": "C'est vous !",
+		"error": "Votre nom de peut pas contenir les caractères suivants : `{{placeholder}}`"
+	},
+	"description": {
+		"label": "Description",
+		"placeholder": "Une courte description du mod.",
+		"error": "La description du mod ne peut contenir les caractères suivants : `{{placeholder}}`"
+	},
+	"license": {
+		"label": "License",
+		"help": "Si vous ne savez pas quelle license choisir, vous pouvez utiliser [cet outil]({{placeholder}})"
+	},
+	"homepage_url": {
+		"label": "URL du Site Web du Mod",
+		"placeholder": "https://example.com",
+		"error": "L'URL du site web du mod doit correspondre au pattern suivant : `{{placeholder}}`"
+	},
+	"source_url": {
+		"label": "URL du Dépôt Source",
+		"placeholder": "https://github.com/your-name/example-mod",
+		"error": "L'URL du site web du mod doit correspondre au pattern suivant : `{{placeholder}}`"
+	},
+	"issues_url": {
+		"label": "URL du Tracker de Bugs",
+		"placeholder": "https://github.com/your-name/example-mod/issues",
+		"error": "L'URL du tracker de bugs du mod doit correspondre au pattern suivant : `{{placeholder}}`"
+	}
+}

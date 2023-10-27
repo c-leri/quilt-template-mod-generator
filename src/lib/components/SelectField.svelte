@@ -1,15 +1,15 @@
 <script lang="ts">
 	import type { SelectOption } from '$lib/types';
 	import { readable, type Readable, type Writable } from 'svelte/store';
-	import { _ } from 'svelte-i18n';
 	import { onDestroy } from 'svelte';
+	import { t } from '$lib/translations';
 
 	export let label: string;
-	export let options: Readable<SelectOption[]>;
+	export let options: Readable<SelectOption[] | undefined>;
 	export let error: Readable<boolean> = readable(false);
 	export let value: Writable<string>;
 	const unsubscriber = options.subscribe((options) => {
-		if (options.length) {
+		if (options?.length) {
 			if (!$value || !options.find((option) => option.value === $value || option.name === $value)) {
 				$value = options[0].value !== undefined ? options[0].value : options[0].name;
 			}
@@ -24,17 +24,23 @@
 <div class="field">
 	<label for={id} class="label is-medium">{label}</label>
 	<div class="control">
-		<div class="select is-medium is-fullwidth {$error ? 'is-danger' : ''}">
+		<div
+			class="select is-medium is-fullwidth {$error
+				? 'is-danger'
+				: $options === undefined && 'is-loading'}"
+		>
 			<select {id} bind:value={$value}>
-				{#each $options as option}
-					{#if option.value !== undefined}
-						<option value={option.value}>
-							{option.translatable ? $_(option.name) : option.name}
-						</option>
-					{:else}
-						<option>{option.translatable ? $_(option.name) : option.name}</option>
-					{/if}
-				{/each}
+				{#if $options}
+					{#each $options as option}
+						{#if option.value !== undefined}
+							<option value={option.value}>
+								{option.translatable ? $t(option.name) : option.name}
+							</option>
+						{:else}
+							<option>{option.translatable ? $t(option.name) : option.name}</option>
+						{/if}
+					{/each}
+				{/if}
 			</select>
 		</div>
 	</div>

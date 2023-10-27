@@ -1,0 +1,49 @@
+{
+	"title": "Dependencies Configuration",
+	"minecraft_version": {
+		"label": "Minecraft Version",
+		"error": "Unable to fetch Minecraft versions, please try again later"
+	},
+	"minecraft_stable": {
+		"label": "Stable?"
+	},
+	"quilt_loader_version": {
+		"label": "Quilt Loader Version",
+		"error": {
+			"with_minecraft_version": "Unable to fetch Quilt Loader versions for Minecraft version {{placeholder}}",
+			"without_minecraft_version": "Unable to fetch Quilt Loader versions for this Minecraft version"
+		},
+		"no_versions": {
+			"with_minecraft_version": "No Quilt Loader versions were found for Minecraft version {{placeholder}}",
+			"without_minecraft_version": "No Quilt Loader versions were found for this Minecraft version"
+		}
+	},
+	"quilt_mappings_version": {
+		"label": "Quilt Mappings Version",
+		"error": {
+			"with_minecraft_version": "Unable to fetch Quilt Mappings versions for Minecraft version {{placeholder}}",
+			"without_minecraft_version": "Unable to fetch Quilt Mappings versions for this Minecraft version"
+		},
+		"no_versions": {
+			"with_minecraft_version": "No Quilt Mappings versions were found for Minecraft version {{placeholder}}",
+			"without_minecraft_version": "No Quilt Mappings versions were found for this Minecraft version"
+		}
+	},
+	"use_qsl_qfapi": {
+		"label": "Use QSL/QSFAPI?"
+	},
+	"qsl_qfapi_version": {
+		"label": "QSL/QFAPI Version",
+		"error": {
+			"with_minecraft_version": "Unable to fetch QSL/QFAPI versions for Minecraft version {{placeholder}}",
+			"without_minecraft_version": "Unable to fetch QSL/QFAPI versions for this Minecraft version"
+		},
+		"no_versions": {
+			"with_minecraft_version": "No QSL/QFAPI versions were found for Minecraft version {{placeholder}}",
+			"without_minecraft_version": "No QSL/QFAPI versions were found for this Minecraft version"
+		}
+	},
+	"use_mixins": {
+		"label": "Use Mixins?"
+	}
+}

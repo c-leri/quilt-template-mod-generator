@@ -1,0 +1,27 @@
+{
+	"title": "Configuration du Mod",
+	"mod_name": {
+		"label": "Nom du Mod",
+		"placeholder": "Example Mod",
+		"error": "Le nom du mod ne peut pas contenir les caractères suivants : `{{placeholder}}`"
+	},
+	"mod_id": {
+		"label": "ID du Mod",
+		"placeholder": "example_mod",
+		"error": "L'id du mod ne peut contenir que les caractères suivants : `{{placeholder}}`"
+	},
+	"group_id": {
+		"label": "ID du Groupe",
+		"placeholder": "net.example",
+		"error": "L'id du groupe ne peut contenir que les caractères suivants : `{{valid_characters}}`",
+		"help": "Si vous n'êtes pas sûr de l'ID de groupe à utiliser et que vous comptez d'héberger le code source du mod sur Github, utilisez `io.github.<VOTRE_PSEUDO>`"
+	},
+	"mod_version": {
+		"label": "Version du Mod",
+		"placeholder": "0.0.1",
+		"error": "La version du mod ne peut contenir que les caractères suivants : `{{placeholder}}`"
+	},
+	"mod_environment": {
+		"label": "Environnement"
+	}
+}

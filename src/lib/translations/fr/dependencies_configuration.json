@@ -1,0 +1,49 @@
+{
+	"title": "Configuration des Dépendances",
+	"minecraft_version": {
+		"label": "Version de Minecraft",
+		"error": "Impossible de récupérer les versions de Minecraft, veuillez réessayer plus tard"
+	},
+	"minecraft_stable": {
+		"label": "Stable ?"
+	},
+	"quilt_loader_version": {
+		"label": "Version du Quilt Loader",
+		"error": {
+			"with_minecraft_version": "Impossible de récupérer les versions du Quilt Loader pour Minecraft version {{placeholder}}",
+			"without_minecraft_version": "Impossible de récupérer les versions du Quilt Loader pour cette version de Minecraft"
+		},
+		"no_versions": {
+			"with_minecraft_version": "Aucune version du Quilt Loader n'a été trouvée pour Minecraft version {{placeholder}}",
+			"without_minecraft_version": "Aucune version du Quilt Loader n'a été trouvée pour cette version de Minecraft"
+		}
+	},
+	"quilt_mappings_version": {
+		"label": "Version des Mappings Quilt",
+		"error": {
+			"with_minecraft_version": "Impossible de récupérer les versions des Mappings Quilt pour Minecraft version {{placeholder}}",
+			"without_minecraft_version": "Impossible de récupérer les versions des Mappings Quilt pour cette version de Minecraft"
+		},
+		"no_versions": {
+			"with_minecraft_version": "Aucune version des Mappings Quilt n'a été trouvée pour Minecraft version {{placeholder}}",
+			"without_minecraft_version": "Aucune version des Mappings Quilt n'a été trouvée pour cette version de Minecraft"
+		}
+	},
+	"use_qsl_qfapi": {
+		"label": "Utiliser QSL/QSFAPI ?"
+	},
+	"qsl_qfapi_version": {
+		"label": "Version de QSL/QFAPI",
+		"error": {
+			"with_minecraft_version": "Impossible de récupérer les versions de QSL/QFAPI pour Minecraft version {{placeholder}}",
+			"without_minecraft_version": "Impossible de récupérer les versions de QSL/QFAPI pour cette version de Minecraft"
+		},
+		"no_versions": {
+			"with_minecraft_version": "Aucune version de QSL/QFAPI n'a été trouvée pour Minecraft version {{placeholder}}",
+			"without_minecraft_version": "Aucune version de QSL/QFAPI n'a été trouvée pour cette version de Minecraft"
+		}
+	},
+	"use_mixins": {
+		"label": "Utiliser des Mixins ?"
+	}
+}

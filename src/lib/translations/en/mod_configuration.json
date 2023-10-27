@@ -1,0 +1,27 @@
+{
+	"title": "Mod Configuration",
+	"mod_name": {
+		"label": "Mod Name",
+		"placeholder": "Example Mod",
+		"error": "Your mod's name cannot contain the following characters: `{{placeholder}}`"
+	},
+	"mod_id": {
+		"label": "Mod ID",
+		"placeholder": "example_mod",
+		"error": "Your mod id must contain only the following characters: `{{placeholder}}`"
+	},
+	"group_id": {
+		"label": "Group ID",
+		"placeholder": "net.example",
+		"error": "Your group id must contain only the following characters: `{{placeholder}}`",
+		"help": "If you are unsure as to what group ID to use and you are planning to host your mod's source code on Github, use `io.github.<YOUR_USERNAME>`"
+	},
+	"mod_version": {
+		"label": "Mod Version",
+		"placeholder": "0.0.1",
+		"error": "Your mod's version must only contain the following characters: `{{placeholder}}`"
+	},
+	"mod_environment": {
+		"label": "Environment"
+	}
+}

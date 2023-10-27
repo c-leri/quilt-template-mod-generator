@@ -1,0 +1,7 @@
+{
+	"mod_environment": {
+		"client": "Client",
+		"both": "Both",
+		"server": "Server"
+	}
+}

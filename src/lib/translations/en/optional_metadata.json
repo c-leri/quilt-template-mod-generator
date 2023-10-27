@@ -1,0 +1,32 @@
+{
+	"title": "Optional Metadata",
+	"author": {
+		"label": "Author",
+		"placeholder": "Thats you!",
+		"error": "Your name cannot contain the following characters: `{{placeholder}}`"
+	},
+	"description": {
+		"label": "Description",
+		"placeholder": "A short description of your mod.",
+		"error": "Your mod's description cannot contain the following characters: `{{placeholder}}`"
+	},
+	"license": {
+		"label": "License",
+		"help": "If you don't know what license to choose, you can use [this tool]({{placeholder}})"
+	},
+	"homepage_url": {
+		"label": "Homepage URL",
+		"placeholder": "https://example.com",
+		"error": "Your mod's homepage url must match the following pattern: `{{placeholder}}`"
+	},
+	"source_url": {
+		"label": "Source Repository URL",
+		"placeholder": "https://github.com/your-name/example-mod",
+		"error": "Your mod's source repository url must match the following pattern: `{{placeholder}}`"
+	},
+	"issues_url": {
+		"label": "Issue Tracker URL",
+		"placeholder": "https://github.com/your-name/example-mod/issues",
+		"error": "Your mod's issue tracker url must match the following pattern: `{{placeholder}}`"
+	}
+}
