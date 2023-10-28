@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { SelectOption } from '$lib/types';
 	import { readable, type Readable, type Writable } from 'svelte/store';
-	import { onDestroy } from 'svelte';
 	import { t } from '$lib/translations';
 
 	export let label: string;
@@ -9,15 +8,12 @@
 	export let options: Readable<SelectOption[] | undefined>;
 	export let error: Readable<boolean> = readable(false);
 	export let value: Writable<string>;
-	const unsubscriber = options.subscribe((options) => {
-		if (options?.length) {
-			if (!$value || !options.find((option) => option.value === $value || option.name === $value)) {
-				$value = options[0].value !== undefined ? options[0].value : options[0].name;
-			}
-		}
-	});
 
-	onDestroy(unsubscriber);
+	$: if ($options?.length) {
+		if (!$value || !$options.find((option) => option.value === $value || option.name === $value)) {
+			$value = $options[0].value !== undefined ? $options[0].value : $options[0].name;
+		}
+	}
 
 	const id = crypto.randomUUID();
 </script>

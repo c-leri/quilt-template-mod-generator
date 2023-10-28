@@ -11,15 +11,7 @@
 	import SelectField from '$lib/components/SelectField.svelte';
 	import TextAreaField from '$lib/components/TextAreaField.svelte';
 	import TextInputField from '$lib/components/TextInputField.svelte';
-	import {
-		get_minecraft_versions,
-		get_qsl_qfapi_versions,
-		get_quilt_loader_versions,
-		get_quilt_mappings_versions
-	} from '$lib/get_versions';
-	import type { SelectOption } from '$lib/types';
-	import { onDestroy, onMount } from 'svelte';
-	import { readable, writable, type Unsubscriber, type Writable } from 'svelte/store';
+	import { readable } from 'svelte/store';
 	import {
 		mod_name,
 		mod_id,
@@ -60,63 +52,12 @@
 	import { generate_template } from '$lib/generate_template';
 	import { t } from '$lib/translations';
 	import IconInputField from '$lib/components/IconInputField.svelte';
-
-	const minecraft_versions: Writable<SelectOption[] | undefined> = writable();
-	const quilt_loader_versions: Writable<SelectOption[] | undefined> = writable();
-	const quilt_mappings_versions: Writable<SelectOption[] | undefined> = writable();
-	const qsl_qfapi_versions: Writable<SelectOption[] | undefined> = writable();
-
-	const unsubscribers: Unsubscriber[] = [];
-
-	onMount(async () => {
-		unsubscribers.push(
-			is_minecraft_stable.subscribe((is_minecraft_stable) => {
-				$minecraft_versions = undefined;
-				get_minecraft_versions(is_minecraft_stable)
-					.then((minecraft_versions) => {
-						$minecraft_versions = minecraft_versions;
-						$is_minecraft_version_error = false;
-					})
-					.catch(() => ($is_minecraft_version_error = true));
-			})
-		);
-
-		unsubscribers.push(
-			minecraft_version.subscribe((minecraft_version) => {
-				if (minecraft_version) {
-					$quilt_loader_versions = undefined;
-					get_quilt_loader_versions(minecraft_version)
-						.then((quilt_loader_versions) => {
-							$quilt_loader_versions = quilt_loader_versions;
-							$is_quilt_loader_version_error = false;
-						})
-						.catch(() => ($is_quilt_loader_version_error = true));
-
-					$quilt_mappings_versions = undefined;
-					get_quilt_mappings_versions(minecraft_version)
-						.then((quilt_mappings_versions) => {
-							$quilt_mappings_versions = quilt_mappings_versions;
-							$is_quilt_mappings_version_error = false;
-						})
-						.catch(() => ($is_quilt_mappings_version_error = true));
-
-					$qsl_qfapi_versions = undefined;
-					get_qsl_qfapi_versions(minecraft_version)
-						.then((qsl_qfapi_versions) => {
-							$qsl_qfapi_versions = qsl_qfapi_versions;
-							$is_qsl_qfapi_version_error = false;
-						})
-						.catch(() => ($is_qsl_qfapi_version_error = true));
-				} else {
-					$quilt_loader_versions = [];
-					$quilt_mappings_versions = [];
-					$qsl_qfapi_versions = [];
-				}
-			})
-		);
-	});
-
-	onDestroy(() => unsubscribers.forEach((unsubscriber) => unsubscriber()));
+	import {
+		minecraft_versions,
+		qsl_qfapi_versions,
+		quilt_loader_versions,
+		quilt_mappings_versions
+	} from '$lib/stores/select_options';
 
 	// prettier-ignore
 	// Generate button

@@ -1,31 +1,32 @@
+import { get } from 'svelte/store';
 import { get_current_gradle_version } from './get_versions';
 import {
-	author_value,
-	description_value,
-	group_id_value,
-	homepage_url_value,
-	icons_value,
-	issues_url_value,
-	license_value,
-	minecraft_version_value,
-	mod_environment_value,
-	mod_id_value,
-	mod_java_class_value,
-	mod_name_value,
-	mod_version_value,
-	qsl_qfapi_version_value,
-	quilt_loader_version_value,
-	quilt_mappings_version_value,
-	source_url_value,
-	use_mixins_value,
-	use_qsl_qfapi_value
+	author,
+	description,
+	group_id,
+	homepage_url,
+	icons,
+	issues_url,
+	license,
+	minecraft_version,
+	mod_environment,
+	mod_id,
+	mod_java_class,
+	mod_name,
+	mod_version,
+	qsl_qfapi_version,
+	quilt_loader_version,
+	quilt_mappings_version,
+	source_url,
+	use_mixins,
+	use_qsl_qfapi
 } from './stores/field_values';
 
 /**
  * @returns the content of the build.gradle file
  */
 export function generate_build_gradle(): string {
-	const qfapi = use_qsl_qfapi_value
+	const qfapi = get(use_qsl_qfapi)
 		? `\n\n\t// QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
 \t// Quilted Fabric API will automatically pull in the correct QSL version.
 \tmodImplementation libs.quilted.fabric.api
@@ -56,7 +57,7 @@ loom {
 \t// Loom and Loader both use this block in order to gather more information about your mod.
 \tmods {
 \t\t// This should match your mod id.
-\t\t"${mod_id_value}" {
+\t\t"${get(mod_id)}" {
 \t\t\t// Tell Loom about each source set used by your mod here. This ensures that your mod's classes are properly transformed by Loader.
 \t\t\tsourceSet("main")
 \t\t\t// If you shade (directly include classes, not JiJ) a dependency into your mod, include it here using one of these methods:
@@ -144,9 +145,9 @@ org.gradle.jvmargs = -Xmx1G
 org.gradle.parallel = true
 
 # Mod Properties
-version = ${mod_version_value}
-maven_group = ${group_id_value}
-archives_base_name = ${mod_id_value}
+version = ${get(mod_version)}
+maven_group = ${get(group_id)}
+archives_base_name = ${get(mod_id)}
 
 # Dependencies are managed at gradle/libs.versions.toml
 `;
@@ -156,7 +157,7 @@ archives_base_name = ${mod_id_value}
  * @returns the content of the README.md file
  */
 export function generate_readme_md(): string {
-	return `# ${mod_name_value}
+	return `# ${get(mod_name)}
 
 This template was generated using c-leri's [Quilt Template Mod Generator](https://c-leri.github.io/quilt-template-mod-generator/)
 `;
@@ -166,24 +167,24 @@ This template was generated using c-leri's [Quilt Template Mod Generator](https:
  * @returns the content of the libs.versions.toml file
  */
 export function generate_libs_versions_toml(): string {
-	const qfapi_version = use_qsl_qfapi_value
-		? `\n\nquilted_fabric_api = "${qsl_qfapi_version_value}"`
+	const qfapi_version = get(use_qsl_qfapi)
+		? `\n\nquilted_fabric_api = "${get(qsl_qfapi_version)}"`
 		: '';
 
-	const qfapi_lib = use_qsl_qfapi_value
+	const qfapi_lib = get(use_qsl_qfapi)
 		? `\n\nquilted_fabric_api = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api", version.ref = "quilted_fabric_api" }
 quilted_fabric_api_deprecated = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api-deprecated", version.ref = "quilted_fabric_api" }`
 		: '';
 
-	const bundle_example = use_qsl_qfapi_value
+	const bundle_example = get(use_qsl_qfapi)
 		? 'quilted_fabric_api = ["quilted_fabric_api", "quilted_fabric_api_deprecated"]'
 		: '# example = ["example-a", "example-b", "example-c"]';
 
 	return `[versions]
 # The latest versions are available at https://lambdaurora.dev/tools/import_quilt.html
-minecraft = "${minecraft_version_value}"
-quilt_mappings = "${quilt_mappings_version_value}"
-quilt_loader = "${quilt_loader_version_value}"${qfapi_version}
+minecraft = "${get(minecraft_version)}"
+quilt_mappings = "${get(quilt_mappings_version)}"
+quilt_loader = "${get(quilt_loader_version)}"${qfapi_version}
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
@@ -219,30 +220,32 @@ zipStorePath=wrapper/dists
  * @returns the content of the main java class
  */
 export function generate_java_main(): string {
-	const initializer_import = use_qsl_qfapi_value
+	const initializer_import = get(use_qsl_qfapi)
 		? `import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;\n`
 		: '';
 
-	const initializer_implement = use_qsl_qfapi_value ? 'implements ModInitializer ' : '';
+	const initializer_implement = get(use_qsl_qfapi) ? 'implements ModInitializer ' : '';
 
-	const initializer_override = use_qsl_qfapi_value
+	const initializer_override = get(use_qsl_qfapi)
 		? `\n\n\t@Override
 \tpublic void onInitialize(ModContainer mod) {
 \t\tLOGGER.info("Hello Quilt world from {}!", mod.metadata().name());
 \t}`
 		: '';
 
-	return `package ${group_id_value}.${mod_id_value};
+	return `package ${get(group_id)}.${get(mod_id)};
 
 ${initializer_import}import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ${mod_java_class_value} ${initializer_implement}{
+public class ${get(mod_java_class)} ${initializer_implement}{
 \t// This logger is used to write text to the console and the log file.
 \t// It is considered best practice to use your mod name as the logger's name.
 \t// That way, it's clear which mod wrote info, warnings, and errors.
-\tpublic static final Logger LOGGER = LoggerFactory.getLogger("${mod_name_value}");${initializer_override}
+\tpublic static final Logger LOGGER = LoggerFactory.getLogger("${get(
+		mod_name
+	)}");${initializer_override}
 }
 `;
 }
@@ -251,43 +254,43 @@ public class ${mod_java_class_value} ${initializer_implement}{
  * @returns the content of the client java class
  */
 export function generate_java_client(): string {
-	const initializer_import = use_qsl_qfapi_value
+	const initializer_import = get(use_qsl_qfapi)
 		? `\nimport org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;${
-				mod_environment_value !== 'client' ? '\n' : ''
+				get(mod_environment) !== 'client' ? '\n' : ''
 		  }`
 		: '';
 
 	const logger_import =
-		mod_environment_value === 'client'
+		get(mod_environment) === 'client'
 			? '\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n'
 			: '';
 
-	const initializer_implement = use_qsl_qfapi_value ? 'implements ClientModInitializer ' : '';
+	const initializer_implement = get(use_qsl_qfapi) ? 'implements ClientModInitializer ' : '';
 
 	const logger_declaration =
-		mod_environment_value === 'client'
+		get(mod_environment) === 'client'
 			? `\t// This logger is used to write text to the console and the log file.
 \t// It is considered best practice to use your mod name as the logger's name.
 \t// That way, it's clear which mod wrote info, warnings, and errors.
-\tpublic static final Logger LOGGER = LoggerFactory.getLogger("${mod_name_value}");\n${
-					use_qsl_qfapi_value ? '\n' : ''
+\tpublic static final Logger LOGGER = LoggerFactory.getLogger("${get(mod_name)}");\n${
+					get(use_qsl_qfapi) ? '\n' : ''
 			  }`
 			: '';
 
-	const initializer_override = use_qsl_qfapi_value
+	const initializer_override = get(use_qsl_qfapi)
 		? `\t@Override
 \tpublic void onInitializeClient(ModContainer mod) {${
-				mod_environment_value === 'client'
+				get(mod_environment) === 'client'
 					? '\n\t\tLOGGER.info("Hello Quilt world from {}!", mod.metadata().name());'
 					: ''
 		  }
 \t}\n`
 		: '';
 
-	return `package ${group_id_value}.${mod_id_value}.client;
+	return `package ${get(group_id)}.${get(mod_id)}.client;
 ${initializer_import}${logger_import}
-public class ${mod_java_class_value}Client ${initializer_implement}{
+public class ${get(mod_java_class)}Client ${initializer_implement}{
 ${logger_declaration}${initializer_override}}
 `;
 }
@@ -296,15 +299,15 @@ ${logger_declaration}${initializer_override}}
  * @returns the content of the mixin example java class
  */
 export function generate_java_mixin(): string {
-	return `package ${group_id_value}.${mod_id_value}.mixin;
+	return `package ${get(group_id)}.${get(mod_id)}.mixin;
 
-import ${group_id_value}.${mod_id_value}.${
-		mod_environment_value === 'client'
-			? 'client.' + mod_java_class_value + 'Client'
-			: mod_java_class_value
+import ${get(group_id)}.${get(mod_id)}.${
+		get(mod_environment) === 'client'
+			? 'client.' + get(mod_java_class) + 'Client'
+			: get(mod_java_class)
 	};
 ${
-	mod_environment_value === 'server'
+	get(mod_environment) === 'server'
 		? 'import net.minecraft.server.MinecraftServer;'
 		: 'import net.minecraft.client.gui.screen.TitleScreen;'
 }
@@ -313,13 +316,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(${mod_environment_value === 'server' ? 'MinecraftServer' : 'TitleScreen'}.class)
-public class ${mod_environment_value === 'server' ? 'MinecraftServer' : 'TitleScreen'}Mixin {
-\t@Inject(method = "${mod_environment_value === 'server' ? 'loadWorld' : 'init'}", at = @At("TAIL"))
+@Mixin(${get(mod_environment) === 'server' ? 'MinecraftServer' : 'TitleScreen'}.class)
+public class ${get(mod_environment) === 'server' ? 'MinecraftServer' : 'TitleScreen'}Mixin {
+\t@Inject(method = "${get(mod_environment) === 'server' ? 'loadWorld' : 'init'}", at = @At("TAIL"))
 \tpublic void onInit(CallbackInfo ci) {
 \t\t${
-		mod_environment_value === 'client' ? mod_java_class_value + 'Client' : mod_java_class_value
-	}.LOGGER.info("This line is printed by a mixin of ${mod_name_value}!");
+		get(mod_environment) === 'client' ? get(mod_java_class) + 'Client' : get(mod_java_class)
+	}.LOGGER.info("This line is printed by a mixin of ${get(mod_name)}!");
 \t}
 }
 `;
@@ -329,93 +332,103 @@ public class ${mod_environment_value === 'server' ? 'MinecraftServer' : 'TitleSc
  * @returns the content of the quilt.mod.json file
  */
 export function generate_quilt_mod_json(): string {
-	const description = description_value ? `,\n\t\t\t"description": "${description_value}",` : '';
+	const description_content = get(description)
+		? `,\n\t\t\t"description": "${get(description)}",`
+		: '';
 
-	let contact = '';
-	if (homepage_url_value || issues_url_value || source_url_value) {
-		contact = ',\n\t\t\t"contact": {';
+	let contact_content = '';
+	if (get(homepage_url) || get(issues_url) || get(source_url)) {
+		contact_content = ',\n\t\t\t"contact": {';
 
-		if (homepage_url_value) {
-			contact += `\n\t\t\t\t"homepage": "${homepage_url_value}"${
-				issues_url_value || source_url_value ? ',' : ''
+		if (get(homepage_url)) {
+			contact_content += `\n\t\t\t\t"homepage": "${get(homepage_url)}"${
+				get(issues_url) || get(source_url) ? ',' : ''
 			}`;
 		}
 
-		if (issues_url_value) {
-			contact += `\n\t\t\t\t"issues": "${issues_url_value}"${source_url_value ? ',' : ''}`;
+		if (get(issues_url)) {
+			contact_content += `\n\t\t\t\t"issues": "${get(issues_url)}"${get(source_url) ? ',' : ''}`;
 		}
 
-		if (source_url_value) {
-			contact += `\n\t\t\t\t"sources": "${source_url_value}"`;
+		if (get(source_url)) {
+			contact_content += `\n\t\t\t\t"sources": "${get(source_url)}"`;
 		}
 
-		contact += '\n\t\t\t},';
+		contact_content += '\n\t\t\t},';
 	}
 
-	const contributors = author_value
+	const contributors_content = get(author)
 		? `,\n\t\t\t"contributors": {
-\t\t\t\t"${author_value}": "Owner"
+\t\t\t\t"${get(author)}": "Owner"
 \t\t\t},`
 		: '';
 
-	const license = license_value ? `,\n\t\t\t"license": "${license_value}"` : '';
+	const license_content = get(license) ? `,\n\t\t\t"license": "${get(license)}"` : '';
 
-	const icon =
-		icons_value && icons_value[0] ? `,\n\t\t\t"icon": "assets/${mod_id_value}/icon.png"` : '';
+	const icon_content =
+		get(icons) && get(icons)[0] ? `,\n\t\t\t"icon": "assets/${get(mod_id)}/icon.png"` : '';
 
-	let entrypoints = '';
-	if (use_qsl_qfapi_value) {
-		entrypoints = '\n\t\t"entrypoints": {\n';
-		switch (mod_environment_value) {
+	let entrypoints_content = '';
+	if (get(use_qsl_qfapi)) {
+		entrypoints_content = '\n\t\t"entrypoints": {\n';
+		switch (get(mod_environment)) {
 			case 'client':
-				entrypoints += `\t\t\t"client_init": "${group_id_value}.${mod_id_value}.client.${mod_java_class_value}Client"\n`;
+				entrypoints_content += `\t\t\t"client_init": "${get(group_id)}.${get(mod_id)}.client.${get(
+					mod_java_class
+				)}Client"\n`;
 				break;
 			case 'both':
-				entrypoints += `\t\t\t"init": "${group_id_value}.${mod_id_value}.${mod_java_class_value}",
-\t\t\t"client_init": "${group_id_value}.${mod_id_value}.client.${mod_java_class_value}Client"\n`;
+				entrypoints_content += `\t\t\t"init": "${get(group_id)}.${get(mod_id)}.${get(
+					mod_java_class
+				)}",
+\t\t\t"client_init": "${get(group_id)}.${get(mod_id)}.client.${get(mod_java_class)}Client"\n`;
 				break;
 			case 'server':
-				entrypoints += `\t\t\t"init": "${group_id_value}.${mod_id_value}.${mod_java_class_value}"\n`;
+				entrypoints_content += `\t\t\t"init": "${get(group_id)}.${get(mod_id)}.${get(
+					mod_java_class
+				)}"\n`;
 				break;
 		}
-		entrypoints += '\t\t},';
+		entrypoints_content += '\t\t},';
 	}
 
-	const qfapi = use_qsl_qfapi_value
+	const qfapi_content = get(use_qsl_qfapi)
 		? `\n\t\t\t{
 \t\t\t\t"id": "quilted_fabric_api",
-\t\t\t\t"versions": ">=${qsl_qfapi_version_value.replace(/-.+/g, '-')}"
+\t\t\t\t"versions": ">=${get(qsl_qfapi_version).replace(/-.+/g, '-')}"
 \t\t\t},`
 		: '';
 
-	const mixin = use_mixins_value ? `\n\t"mixin": "${mod_id_value}.mixins.json",` : '';
+	const mixin_content = get(use_mixins) ? `\n\t"mixin": "${get(mod_id)}.mixins.json",` : '';
 
 	return `{
 \t"schema_version": 1,
 \t"quilt_loader": {
-\t\t"group": "${group_id_value}",
-\t\t"id": "${mod_id_value}",
+\t\t"group": "${get(group_id)}",
+\t\t"id": "${get(mod_id)}",
 \t\t"version": "\${version}",
 \t\t"metadata": {
-\t\t\t"name": "${mod_name_value}"${description}${contact}${contributors}${license}${icon}
+\t\t\t"name": "${get(
+		mod_name
+	)}"${description_content}${contact_content}${contributors_content}${license_content}${icon_content}
 \t\t},
-\t\t"intermediate_mappings": "net.fabricmc:intermediary",${entrypoints}
+\t\t"intermediate_mappings": "net.fabricmc:intermediary",${entrypoints_content}
 \t\t"depends": [
 \t\t\t{
 \t\t\t\t"id": "quilt_loader",
-\t\t\t\t"versions": ">=${quilt_loader_version_value.replace(/-.+/g, '-')}"
-\t\t\t},${qfapi}
+\t\t\t\t"versions": ">=${get(quilt_loader_version).replace(/-.+/g, '-')}"
+\t\t\t},${qfapi_content}
 \t\t\t{
 \t\t\t\t"id": "minecraft",
-\t\t\t\t"versions": "~${minecraft_version_value}"
+\t\t\t\t"versions": "~${get(minecraft_version)}"
 \t\t\t}
 \t\t]
-\t},${mixin}
+\t},${mixin_content}
 \t"minecraft": {
 \t\t"environment": "${
-		mod_environment_value === 'both'
+		get(mod_environment) === 'both'
 			? '*'
-			: mod_environment_value === 'server'
+			: get(mod_environment) === 'server'
 			? 'dedicated_server'
 			: 'client'
 	}"
@@ -431,11 +444,11 @@ export function generate_mixins_json(): string {
 	return `{
 "required": true,
 "minVersion": "0.8",
-"package": "${group_id_value}.${mod_id_value}.mixin",
+"package": "${get(group_id)}.${get(mod_id)}.mixin",
 "compatibilityLevel": "JAVA_17",
 "mixins": [],
-"client": [${mod_environment_value !== 'server' ? '\n    "TitleScreenMixin"\n  ' : ''}],
-"server": [${mod_environment_value === 'server' ? '\n    "MinecraftServerMixin"\n  ' : ''}],
+"client": [${get(mod_environment) !== 'server' ? '\n    "TitleScreenMixin"\n  ' : ''}],
+"server": [${get(mod_environment) === 'server' ? '\n    "MinecraftServerMixin"\n  ' : ''}],
 "injectors": {
 	"defaultRequire": 1
 }
@@ -449,7 +462,7 @@ export function generate_mixins_json(): string {
 export function generate_mit_license(): string {
 	return `MIT License
 
-Copyright (c) ${new Date().getFullYear()} ${author_value ? author_value : '<copyright holders>'}
+Copyright (c) ${new Date().getFullYear()} ${get(author) ? get(author) : '<copyright holders>'}
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -465,7 +478,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 export function generate_isc_license(): string {
 	return `ISC License
 
-Copyright (c) ${new Date().getFullYear()} ${author_value ? author_value : '<copyright holders>'}
+Copyright (c) ${new Date().getFullYear()} ${get(author) ? get(author) : '<copyright holders>'}
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above

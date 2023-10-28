@@ -1,3 +1,4 @@
+import { get } from 'svelte/store';
 import type {
 	GradleVersion,
 	MinecraftVersion,
@@ -5,13 +6,14 @@ import type {
 	QuiltLoaderVersion,
 	QuiltMappingsVersion
 } from './types';
+import { is_minecraft_stable, minecraft_version } from './stores/field_values';
 
 const QUILT_META = 'https://meta.quiltmc.org/v3/versions';
 
 /**
  * @throws {Error}
  */
-export async function get_minecraft_versions(stable: boolean): Promise<SelectOption[]> {
+export async function get_minecraft_versions(): Promise<SelectOption[]> {
 	const url = QUILT_META + '/game';
 	const response = await fetch(url, {
 		method: 'GET',
@@ -26,26 +28,29 @@ export async function get_minecraft_versions(stable: boolean): Promise<SelectOpt
 
 	let response_body: MinecraftVersion[] = await response.json();
 
-	if (stable) {
-		response_body = response_body.filter((minecraft_versions) => minecraft_versions.stable);
+	if (get(is_minecraft_stable)) {
+		response_body = response_body.filter((minecraft_version) => minecraft_version.stable);
 	}
 
-	return response_body.map((minecraft_versions) => {
-		return { name: minecraft_versions.version };
+	// Removes the versions orior to 1.18.2 as there is no quilt mappings for them
+	const version_1_18_2_index = response_body.findIndex(
+		(minecraft_version) => minecraft_version.version === '1.18.2'
+	);
+
+	return response_body.slice(0, version_1_18_2_index + 1).map((minecraft_version) => {
+		return { name: minecraft_version.version };
 	});
 }
 
 /**
  * @throws {Error}
  */
-export async function get_quilt_loader_versions(
-	minecraft_version: string
-): Promise<SelectOption[]> {
-	if (!minecraft_version) {
+export async function get_quilt_loader_versions(): Promise<SelectOption[]> {
+	if (!get(minecraft_version)) {
 		throw new Error("Can't fetch Quilt Loader vesions without a minecraft version");
 	}
 
-	const url = `${QUILT_META}/loader/${minecraft_version}`;
+	const url = `${QUILT_META}/loader/${get(minecraft_version)}`;
 	const response = await fetch(url, {
 		method: 'GET',
 		headers: {
@@ -67,10 +72,8 @@ export async function get_quilt_loader_versions(
 /**
  * @throws {Error}
  */
-export async function get_quilt_mappings_versions(
-	minecraft_version: string
-): Promise<SelectOption[]> {
-	const url = `${QUILT_META}/quilt-mappings/${minecraft_version}`;
+export async function get_quilt_mappings_versions(): Promise<SelectOption[]> {
+	const url = `${QUILT_META}/quilt-mappings/${get(minecraft_version)}`;
 	const response = await fetch(url, {
 		method: 'GET',
 		headers: {
@@ -92,8 +95,8 @@ export async function get_quilt_mappings_versions(
 /**
  * @throws {Error}
  */
-export async function get_qsl_qfapi_versions(minecraft_version: string): Promise<SelectOption[]> {
-	if (!minecraft_version) {
+export async function get_qsl_qfapi_versions(): Promise<SelectOption[]> {
+	if (!get(minecraft_version)) {
 		throw new Error("Can't fetch QSL/QFAPI vesions without a minecraft version");
 	}
 
@@ -118,9 +121,9 @@ export async function get_qsl_qfapi_versions(minecraft_version: string): Promise
 	).map((version_element) => version_element.textContent);
 
 	return qsl_qfapi_version
-		.filter((version) => version !== null && version.endsWith(minecraft_version))
+		.filter((version) => version !== null && version.endsWith(get(minecraft_version)))
 		.map((version) => {
-			return { name: version!.replace(`-${minecraft_version}`, ''), value: version! };
+			return { name: version!.replace(`-${get(minecraft_version)}`, ''), value: version! };
 		})
 		.reverse();
 }
