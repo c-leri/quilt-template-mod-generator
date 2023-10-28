@@ -329,27 +329,11 @@ public class ${mod_environment_value === 'server' ? 'MinecraftServer' : 'TitleSc
  * @returns the content of the quilt.mod.json file
  */
 export function generate_quilt_mod_json(): string {
-	let entrypoints = '';
-	if (use_qsl_qfapi_value) {
-		entrypoints = '\n\t\t"entrypoints": {\n';
-		switch (mod_environment_value) {
-			case 'client':
-				entrypoints += `\t\t\t"client_init": "${group_id_value}.${mod_id_value}.client.${mod_java_class_value}Client"\n`;
-				break;
-			case 'both':
-				entrypoints += `\t\t\t"init": "${group_id_value}.${mod_id_value}.${mod_java_class_value}",
-\t\t\t"client_init": "${group_id_value}.${mod_id_value}.client.${mod_java_class_value}Client"\n`;
-				break;
-			case 'server':
-				entrypoints += `\t\t\t"init": "${group_id_value}.${mod_id_value}.${mod_java_class_value}"\n`;
-				break;
-		}
-		entrypoints += '\t\t},';
-	}
+	const description = description_value ? `,\n\t\t\t"description": "${description_value}",` : '';
 
 	let contact = '';
 	if (homepage_url_value || issues_url_value || source_url_value) {
-		contact = '\n\t\t\t"contact": {';
+		contact = ',\n\t\t\t"contact": {';
 
 		if (homepage_url_value) {
 			contact += `\n\t\t\t\t"homepage": "${homepage_url_value}"${
@@ -368,15 +352,34 @@ export function generate_quilt_mod_json(): string {
 		contact += '\n\t\t\t},';
 	}
 
-	const description = description_value ? `\n\t\t\t"description": "${description_value}",` : '';
-
 	const contributors = author_value
-		? `\n\t\t\t"contributors": {
+		? `,\n\t\t\t"contributors": {
 \t\t\t\t"${author_value}": "Owner"
 \t\t\t},`
 		: '';
 
-	const license = license_value ? `\n\t\t\t"license": "${license_value}",` : '';
+	const license = license_value ? `,\n\t\t\t"license": "${license_value}"` : '';
+
+	const icon =
+		icons_value && icons_value[0] ? `,\n\t\t\t"icon": "assets/${mod_id_value}/icon.png"` : '';
+
+	let entrypoints = '';
+	if (use_qsl_qfapi_value) {
+		entrypoints = '\n\t\t"entrypoints": {\n';
+		switch (mod_environment_value) {
+			case 'client':
+				entrypoints += `\t\t\t"client_init": "${group_id_value}.${mod_id_value}.client.${mod_java_class_value}Client"\n`;
+				break;
+			case 'both':
+				entrypoints += `\t\t\t"init": "${group_id_value}.${mod_id_value}.${mod_java_class_value}",
+\t\t\t"client_init": "${group_id_value}.${mod_id_value}.client.${mod_java_class_value}Client"\n`;
+				break;
+			case 'server':
+				entrypoints += `\t\t\t"init": "${group_id_value}.${mod_id_value}.${mod_java_class_value}"\n`;
+				break;
+		}
+		entrypoints += '\t\t},';
+	}
 
 	const qfapi = use_qsl_qfapi_value
 		? `\n\t\t\t{
@@ -384,9 +387,6 @@ export function generate_quilt_mod_json(): string {
 \t\t\t\t"versions": ">=${qsl_qfapi_version_value.replace(/-.+/g, '-')}"
 \t\t\t},`
 		: '';
-
-	const icon =
-		icons_value && icons_value[0] ? `\n\t\t\t"icon": "assets/${mod_id_value}/icon.png"` : '';
 
 	const mixin = use_mixins_value ? `\n\t"mixin": "${mod_id_value}.mixins.json",` : '';
 
@@ -397,7 +397,7 @@ export function generate_quilt_mod_json(): string {
 \t\t"id": "${mod_id_value}",
 \t\t"version": "\${version}",
 \t\t"metadata": {
-\t\t\t"name": "${mod_name_value}",${description}${contact}${contributors}${license}${icon}
+\t\t\t"name": "${mod_name_value}"${description}${contact}${contributors}${license}${icon}
 \t\t},
 \t\t"intermediate_mappings": "net.fabricmc:intermediary",${entrypoints}
 \t\t"depends": [
@@ -456,5 +456,27 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice (including the next paragraph) shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+`;
+}
+
+/**
+ * @returns the content of the ISC Licnese
+ */
+export function generate_isc_license(): string {
+	return `ISC License
+
+Copyright (c) ${new Date().getFullYear()} ${author_value ? author_value : '<copyright holders>'}
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
 `;
 }

@@ -3,6 +3,7 @@
 
 	export let label: string;
 	export let placeholder: string;
+	export let required: boolean = false;
 	export let error: Readable<boolean> = readable(false);
 	export let value: Writable<string>;
 
@@ -10,7 +11,12 @@
 </script>
 
 <div class="field">
-	<label for={id} class="label is-medium">{label}</label>
+	<label for={id} class="label is-medium">
+		{label}
+		{#if required}
+			<span class="has-text-danger">*</span>
+		{/if}
+	</label>
 	<div class="control">
 		<input
 			{id}

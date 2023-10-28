@@ -13,6 +13,7 @@ import {
 	generate_build_gradle,
 	generate_gradle_properties,
 	generate_gradle_wrapper_properties,
+	generate_isc_license,
 	generate_java_client,
 	generate_java_main,
 	generate_java_mixin,
@@ -22,11 +23,12 @@ import {
 	generate_quilt_mod_json,
 	generate_readme_md
 } from './generate_files_content';
-import unlicense from '$lib/template-files/licenses/Unlicense.txt?raw';
 import cc01_0 from '$lib/template-files/licenses/CC0-1.0.txt?raw';
-import LGPL3 from '$lib/template-files/licenses/LGPL-3.0-only.txt?raw';
+import bsl1_0 from '$lib/template-files/licenses/BSL-1.0.txt?raw';
+import unlicense from '$lib/template-files/licenses/Unlicense.txt?raw';
 import apache2 from '$lib/template-files/licenses/Apache-2.0.txt?raw';
 import MPL2 from '$lib/template-files/licenses/MPL-2.0.txt?raw';
+import LGPL3 from '$lib/template-files/licenses/LGPL-3.0-only.txt?raw';
 import editorconfig from '$lib/template-files/editorconfig?raw';
 import gitattributes from '$lib/template-files/gitattributes?raw';
 import gitignore from '$lib/template-files/gitignore?raw';
@@ -37,23 +39,29 @@ import graddlewrapper_jar_url from '$lib/template-files/gradle-wrapper.jar?url';
 
 async function add_license_file_to_folder(folder: JSZip) {
 	switch (license_value) {
-		case 'MIT':
-			folder.file('LICENSE', generate_mit_license());
+		case 'CC0-1.0':
+			folder.file('LICENSE', cc01_0);
 			break;
 		case 'Unlicense':
 			folder.file('LICENSE', unlicense);
 			break;
-		case 'CC0-1.0':
-			folder.file('LICENSE', cc01_0);
+		case 'BSL-1.0':
+			folder.file('LICENSE', bsl1_0);
 			break;
-		case 'LGPL-3.0-only':
-			folder.file('LICENSE', LGPL3);
+		case 'MIT':
+			folder.file('LICENSE', generate_mit_license());
+			break;
+		case 'ISC':
+			folder.file('LICENSE', generate_isc_license());
 			break;
 		case 'Apache-2.0':
 			folder.file('LICENSE', apache2);
 			break;
 		case 'MPL-2.0':
 			folder.file('LICENSE', MPL2);
+			break;
+		case 'LGPL-3.0-only':
+			folder.file('LICENSE', LGPL3);
 			break;
 	}
 }

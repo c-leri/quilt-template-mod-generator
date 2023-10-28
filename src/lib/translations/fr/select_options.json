@@ -1,7 +1,10 @@
 {
-	"mod_environment": {
+	"mod_environments": {
 		"client": "Client",
 		"both": "Les Deux",
 		"server": "Serveur"
+	},
+	"licenses": {
+		"no_license": "Pas de license"
 	}
 }

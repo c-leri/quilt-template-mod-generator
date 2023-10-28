@@ -27,9 +27,11 @@ export type ModEnvironment = 'client' | 'both' | 'server';
 
 export type License =
 	| ''
-	| 'Unlicense'
 	| 'CC0-1.0'
-	| 'LGPL-3.0-only'
+	| 'Unlicense'
+	| 'BSL-1.0'
 	| 'MIT'
+	| 'ISC'
 	| 'Apache-2.0'
-	| 'MPL-2.0';
+	| 'MPL-2.0'
+	| 'LGPL-3.0-only';

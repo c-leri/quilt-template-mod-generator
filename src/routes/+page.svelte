@@ -146,6 +146,7 @@
 			placeholder={$t('mod_configuration.mod_name.placeholder')}
 			error={is_mod_name_error}
 			value={mod_name}
+			required
 		>
 			{#if $is_mod_name_error}
 				{@html snarkdown(
@@ -161,6 +162,7 @@
 			placeholder={$t('mod_configuration.mod_id.placeholder')}
 			error={is_mod_id_error}
 			value={mod_id}
+			required
 		>
 			{#if $is_mod_id_error}
 				{@html snarkdown(
@@ -176,6 +178,7 @@
 			placeholder={$t('mod_configuration.group_id.placeholder')}
 			error={is_group_id_error}
 			value={group_id}
+			required
 		>
 			{#if $is_group_id_error}
 				{@html snarkdown(
@@ -193,6 +196,7 @@
 			placeholder={$t('mod_configuration.mod_version.placeholder')}
 			error={is_mod_version_error}
 			value={mod_version}
+			required
 		>
 			{#if $is_mod_version_error}
 				{@html snarkdown(
@@ -207,6 +211,7 @@
 			label={$t('mod_configuration.mod_environment.label')}
 			options={readable(mod_environments)}
 			value={mod_environment}
+			required
 		/>
 	</section>
 
@@ -218,6 +223,7 @@
 			options={minecraft_versions}
 			value={minecraft_version}
 			error={is_minecraft_version_error}
+			required
 		>
 			{#if $is_minecraft_version_error}
 				{$t('dependencies_configuration.minecraft_version.error')}
@@ -234,6 +240,7 @@
 			options={quilt_loader_versions}
 			error={is_quilt_loader_version_error}
 			value={quilt_loader_version}
+			required
 		>
 			{#if $is_quilt_loader_version_error}
 				{$minecraft_version
@@ -260,6 +267,7 @@
 			options={quilt_mappings_versions}
 			value={quilt_mappings_version}
 			error={is_quilt_mappings_version_error}
+			required
 		>
 			{#if $is_quilt_mappings_version_error}
 				{$minecraft_version
@@ -292,6 +300,7 @@
 				options={qsl_qfapi_versions}
 				value={qsl_qfapi_version}
 				error={is_qsl_qfapi_version_error}
+				required
 			>
 				{#if $is_qsl_qfapi_version_error}
 					{$minecraft_version
