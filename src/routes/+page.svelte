@@ -1,5 +1,5 @@
 <script lang="ts">
-	import snarkdown from 'snarkdown';
+	import SvelteMarkdown from 'svelte-markdown';
 	import {
 		GENERIC_JSON_INVALID_CHARACTERS,
 		GROUP_ID_VALID_CHARACTERS,
@@ -90,11 +90,11 @@
 			required
 		>
 			{#if $is_mod_name_error}
-				{@html snarkdown(
-					$t('mod_configuration.mod_name.error', {
+				<SvelteMarkdown
+					source={$t('mod_configuration.mod_name.error', {
 						placeholder: GENERIC_JSON_INVALID_CHARACTERS
-					})
-				)}
+					})}
+				/>
 			{/if}
 		</TextInputField>
 
@@ -106,11 +106,11 @@
 			required
 		>
 			{#if $is_mod_id_error}
-				{@html snarkdown(
-					$t('mod_configuration.mod_id.error', {
+				<SvelteMarkdown
+					source={$t('mod_configuration.mod_id.error', {
 						placeholder: MOD_ID_VALID_CHARACTERS
-					})
-				)}
+					})}
+				/>
 			{/if}
 		</TextInputField>
 
@@ -122,13 +122,13 @@
 			required
 		>
 			{#if $is_group_id_error}
-				{@html snarkdown(
-					$t('mod_configuration.group_id.error', {
+				<SvelteMarkdown
+					source={$t('mod_configuration.group_id.error', {
 						placeholder: GROUP_ID_VALID_CHARACTERS
-					})
-				)}
+					})}
+				/>
 			{:else}
-				{@html snarkdown($t('mod_configuration.group_id.help'))}
+				<SvelteMarkdown source={$t('mod_configuration.group_id.help')} />
 			{/if}
 		</TextInputField>
 
@@ -140,11 +140,11 @@
 			required
 		>
 			{#if $is_mod_version_error}
-				{@html snarkdown(
-					$t('mod_configuration.mod_version.error', {
+				<SvelteMarkdown
+					source={$t('mod_configuration.mod_version.error', {
 						placeholder: MOD_VERSION_VALID_CHARACTERS
-					})
-				)}
+					})}
+				/>
 			{/if}
 		</TextInputField>
 
@@ -279,11 +279,11 @@
 			value={author}
 		>
 			{#if $is_author_error}
-				{@html snarkdown(
-					$t('optional_metadata.author.error', {
+				<SvelteMarkdown
+					source={$t('optional_metadata.author.error', {
 						placeholder: GENERIC_JSON_INVALID_CHARACTERS
-					})
-				)}
+					})}
+				/>
 			{/if}
 		</TextInputField>
 
@@ -294,11 +294,11 @@
 			value={description}
 		>
 			{#if $is_description_error}
-				{@html snarkdown(
-					$t('optional_metadata.description.error', {
+				<SvelteMarkdown
+					source={$t('optional_metadata.description.error', {
 						placeholder: GENERIC_JSON_INVALID_CHARACTERS
-					})
-				)}
+					})}
+				/>
 			{/if}
 		</TextAreaField>
 
@@ -307,9 +307,11 @@
 			options={readable(licenses)}
 			value={license}
 		>
-			{@html snarkdown(
-				$t('optional_metadata.license.help', { placeholder: 'https://choosealicense.com/' })
-			)}
+			<SvelteMarkdown
+				source={$t('optional_metadata.license.help', {
+					placeholder: 'https://choosealicense.com/'
+				})}
+			/>
 		</SelectField>
 
 		<TextInputField
@@ -319,11 +321,11 @@
 			value={homepage_url}
 		>
 			{#if $is_homepage_url_error}
-				{@html snarkdown(
-					$t('optional_metadata.homepage_url.error', {
+				<SvelteMarkdown
+					source={$t('optional_metadata.homepage_url.error', {
 						placeholder: URL_PATTERN
-					})
-				)}
+					})}
+				/>
 			{/if}
 		</TextInputField>
 
@@ -334,11 +336,11 @@
 			value={source_url}
 		>
 			{#if $is_source_url_error}
-				{@html snarkdown(
-					$t('optional_metadata.source_url.error', {
+				<SvelteMarkdown
+					source={$t('optional_metadata.source_url.error', {
 						placeholder: URL_PATTERN
-					})
-				)}
+					})}
+				/>
 			{/if}
 		</TextInputField>
 
@@ -349,11 +351,11 @@
 			value={issues_url}
 		>
 			{#if $is_issues_url_error}
-				{@html snarkdown(
-					$t('optional_metadata.issues_url.error', {
+				<SvelteMarkdown
+					source={$t('optional_metadata.issues_url.error', {
 						placeholder: URL_PATTERN
-					})
-				)}
+					})}
+				/>
 			{/if}
 		</TextInputField>
 	</section>
