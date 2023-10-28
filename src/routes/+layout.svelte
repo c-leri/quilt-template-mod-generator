@@ -18,7 +18,6 @@
 	<title>{$t('general.title')}</title>
 </svelte:head>
 
-<input id="toggle-navbar" type="checkbox" class="is-hidden" />
 <Header />
 
 <div class="container">
