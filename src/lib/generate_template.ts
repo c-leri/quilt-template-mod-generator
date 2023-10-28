@@ -34,11 +34,14 @@ async function add_license_file_to_folder(folder: JSZip) {
 	} else if (get(license) === 'ISC') {
 		license_content = generate_isc_license();
 	} else if (get(license)) {
+		console.log(get(license));
 		license_content = (await import(`$lib/template-files/licenses/${get(license)}.txt?raw`))
 			.default;
 	}
 
-	folder.file('LICENSE', license_content);
+	if (license_content) {
+		folder.file('LICENSE', license_content);
+	}
 }
 
 async function add_static_file_to_foler(folder: JSZip, fileName: StaticTextFiles) {
@@ -114,8 +117,8 @@ export async function generate_template() {
 		resources_folder?.file(`${get(mod_id)}.mixins.json`, generate_mixins_json());
 	}
 
-	const mod_assets_folder = resources_folder?.folder(`assets/${get(mod_id)}`);
 	if (get(icons) && get(icons)[0]) {
+		const mod_assets_folder = resources_folder?.folder(`assets/${get(mod_id)}`);
 		mod_assets_folder?.file('icon.png', get(icons)[0].arrayBuffer(), { binary: true });
 	}
 
