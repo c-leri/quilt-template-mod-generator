@@ -1,5 +1,9 @@
 {
 	"title": "Optional Metadata",
+	"icon": {
+		"label": "Icon",
+		"call_to_action": "Choose a file..."
+	},
 	"author": {
 		"label": "Author",
 		"placeholder": "Thats you!",

@@ -4,6 +4,7 @@ import {
 	description_value,
 	group_id_value,
 	homepage_url_value,
+	icons_value,
 	issues_url_value,
 	license_value,
 	minecraft_version_value,
@@ -384,6 +385,9 @@ export function generate_quilt_mod_json(): string {
 \t\t\t},`
 		: '';
 
+	const icon =
+		icons_value && icons_value[0] ? `\n\t\t\t"icon": "assets/${mod_id_value}/icon.png"` : '';
+
 	const mixin = use_mixins_value ? `\n\t"mixin": "${mod_id_value}.mixins.json",` : '';
 
 	return `{
@@ -393,8 +397,7 @@ export function generate_quilt_mod_json(): string {
 \t\t"id": "${mod_id_value}",
 \t\t"version": "\${version}",
 \t\t"metadata": {
-\t\t\t"name": "${mod_name_value}",${description}${contact}${contributors}${license}
-\t\t\t"icon": "assets/${mod_id_value}/icon.png"
+\t\t\t"name": "${mod_name_value}",${description}${contact}${contributors}${license}${icon}
 \t\t},
 \t\t"intermediate_mappings": "net.fabricmc:intermediary",${entrypoints}
 \t\t"depends": [

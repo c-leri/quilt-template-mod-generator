@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
 import {
 	group_id_value,
+	icons_value,
 	license_value,
 	mod_environment_value,
 	mod_id_value,
@@ -30,44 +31,9 @@ import editorconfig from '$lib/template-files/editorconfig?raw';
 import gitattributes from '$lib/template-files/gitattributes?raw';
 import gitignore from '$lib/template-files/gitignore?raw';
 import gradlew from '$lib/template-files/gradlew?raw';
-import gradlew_bat from '$lib/template-files/gradlew-bat?raw';
+import gradlew_bat from '$lib/template-files/gradlew.bat?raw';
 import settings_gradle from '$lib/template-files/settings.gradle?raw';
 import graddlewrapper_jar_url from '$lib/template-files/gradle-wrapper.jar?url';
-import icon_url from '$lib/template-files/icon.png?url';
-
-/**
- * @param file_content the imported file content
- */
-async function add_static_text_file_to_folder(
-	folder: JSZip,
-	fileName: string,
-	fileContent: string
-) {
-	folder.file(fileName, fileContent);
-}
-
-/**
- * @param file_url the imported file url
- */
-async function add_static_binary_file_to_folder(
-	foler: JSZip,
-	fileName: string,
-	fileUrl: string,
-	fileType: string
-) {
-	foler.file(
-		fileName,
-		(
-			await fetch(fileUrl, {
-				method: 'GET',
-				headers: {
-					Accept: fileType
-				}
-			})
-		).arrayBuffer(),
-		{ binary: true }
-	);
-}
 
 async function add_license_file_to_folder(folder: JSZip) {
 	switch (license_value) {
@@ -95,15 +61,14 @@ async function add_license_file_to_folder(folder: JSZip) {
 export async function generate_template() {
 	const root = new JSZip();
 
-	await Promise.all([
-		add_static_text_file_to_folder(root, '.editorconfig', editorconfig),
-		add_static_text_file_to_folder(root, '.gitattributes', gitattributes),
-		add_static_text_file_to_folder(root, '.gitignore', gitignore),
-		add_static_text_file_to_folder(root, 'gradlew', gradlew),
-		add_static_text_file_to_folder(root, 'gradlew.bat', gradlew_bat),
-		add_static_text_file_to_folder(root, 'settings.gradle', settings_gradle),
-		add_license_file_to_folder(root)
-	]);
+	root?.file('.editorconfig', editorconfig);
+	root?.file('.gitattributes', gitattributes);
+	root?.file('.gitignore', gitignore);
+	root?.file('gradlew', gradlew);
+	root?.file('gradlew.bat', gradlew_bat);
+	root?.file('settings.gradle', settings_gradle);
+
+	await add_license_file_to_folder(root);
 
 	root.file('build.gradle', generate_build_gradle());
 	root.file('gradle.properties', generate_gradle_properties());
@@ -113,12 +78,19 @@ export async function generate_template() {
 	gradle_folder!.file('libs.versions.toml', generate_libs_versions_toml());
 
 	const gradle_wrapper_folder = gradle_folder!.folder('wrapper');
-	await add_static_binary_file_to_folder(
-		gradle_wrapper_folder!,
+	gradle_wrapper_folder!.file(
 		'gradle-wrapper.jar',
-		graddlewrapper_jar_url,
-		'application/java-archive'
+		(
+			await fetch(graddlewrapper_jar_url, {
+				method: 'GET',
+				headers: {
+					Accept: 'application/java-archive'
+				}
+			})
+		).arrayBuffer(),
+		{ binary: true }
 	);
+
 	gradle_wrapper_folder!.file('gradle-wrapper.properties', generate_gradle_wrapper_properties());
 
 	const main_folder = root.folder('src/main');
@@ -152,7 +124,9 @@ export async function generate_template() {
 	}
 
 	const mod_assets_folder = resources_folder!.folder(`assets/${mod_id_value}`);
-	await add_static_binary_file_to_folder(mod_assets_folder!, 'icon.png', icon_url, 'image/png');
+	if (icons_value && icons_value[0]) {
+		mod_assets_folder?.file('icon.png', icons_value[0].arrayBuffer(), { binary: true });
+	}
 
 	root.generateAsync({ type: 'blob' }).then((value) => {
 		const a = document.createElement('a');

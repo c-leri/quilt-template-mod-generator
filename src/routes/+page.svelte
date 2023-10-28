@@ -58,6 +58,7 @@
 	import { licenses, mod_environments } from '$lib/constants/select_options';
 	import { generate_template } from '$lib/generate_template';
 	import { t } from '$lib/translations';
+	import IconInputField from '$lib/components/IconInputField.svelte';
 
 	const minecraft_versions: Writable<SelectOption[] | undefined> = writable();
 	const quilt_loader_versions: Writable<SelectOption[] | undefined> = writable();
@@ -316,6 +317,8 @@
 
 	<section class="section">
 		<h1 class="title has-text-centered">{$t('optional_metadata.title')}</h1>
+
+		<IconInputField />
 
 		<TextInputField
 			label={$t('optional_metadata.author.label')}

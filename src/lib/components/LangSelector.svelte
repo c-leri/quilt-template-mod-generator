@@ -27,6 +27,6 @@
 		</select>
 	</div>
 	<div class="icon is-left">
-		<i class="fa-solid fa-language" />
+		<i class="fas fa-language" />
 	</div>
 </div>

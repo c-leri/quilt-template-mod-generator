@@ -59,6 +59,10 @@ export const use_mixins: Writable<boolean> = writable(true);
 export let use_mixins_value: boolean;
 use_mixins.subscribe((use_mixins) => (use_mixins_value = use_mixins));
 
+export const icons: Writable<File[]> = writable();
+export let icons_value: File[];
+icons.subscribe((icons) => (icons_value = icons));
+
 export const author: Writable<string> = writable();
 export let author_value: string;
 author.subscribe((author) => (author_value = author));

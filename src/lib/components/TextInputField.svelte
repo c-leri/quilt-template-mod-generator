@@ -14,7 +14,7 @@
 	<div class="control">
 		<input
 			{id}
-			class="input is-mediu {$error ? 'is-danger' : ''}"
+			class="input is-medium {$error ? 'is-danger' : ''}"
 			type="text"
 			{placeholder}
 			bind:value={$value}
