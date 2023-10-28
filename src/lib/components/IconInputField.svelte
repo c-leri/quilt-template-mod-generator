@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { is_icon_error } from '$lib/stores/field_errors';
 	import { icons } from '$lib/stores/field_values';
 	import { t } from '$lib/translations';
 
@@ -14,7 +15,7 @@
 
 <div class="field">
 	<label class="label is-medium" for={id}>{$t('optional_metadata.icon.label')}</label>
-	<div class="is-flex">
+	<div class="control is-flex">
 		<div class="file is-medium {$icons && $icons[0] && 'has-name'}">
 			<label class="file-label">
 				<input
@@ -53,12 +54,22 @@
 			</button>
 		{/if}
 	</div>
+	{#if $is_icon_error}
+		<p class="help is-medium is-danger">
+			{$t('optional_metadata.icon.error')}
+		</p>
+	{/if}
 </div>
 
 <style>
 	.file-cta,
 	.file-label:hover .file-cta {
 		color: #271f33;
+	}
+
+	.help {
+		font-size: 1rem;
+		opacity: 0.8;
 	}
 
 	#delete {

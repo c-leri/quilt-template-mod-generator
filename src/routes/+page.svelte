@@ -53,7 +53,8 @@
 		is_minecraft_version_error,
 		is_quilt_loader_version_error,
 		is_quilt_mappings_version_error,
-		is_qsl_qfapi_version_error
+		is_qsl_qfapi_version_error,
+		is_icon_error
 	} from '$lib/stores/field_errors';
 	import { licenses, mod_environments } from '$lib/constants/select_options';
 	import { generate_template } from '$lib/generate_template';
@@ -128,6 +129,7 @@
 		!$quilt_loader_version ||
 		!$quilt_mappings_version ||
 		($use_qsl_qfapi && !$qsl_qfapi_version) ||
+		$is_icon_error ||
 		$is_author_error ||
 		$is_description_error ||
 		$is_homepage_url_error ||

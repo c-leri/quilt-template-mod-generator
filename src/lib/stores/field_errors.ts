@@ -4,6 +4,7 @@ import {
 	description,
 	group_id,
 	homepage_url,
+	icons,
 	issues_url,
 	mod_id,
 	mod_name,
@@ -42,6 +43,20 @@ export const is_mod_version_error: Writable<boolean> = writable(false);
 mod_version.subscribe((mod_version) =>
 	is_mod_version_error.set(mod_version !== undefined && MOD_VERSION_VALIDATOR.test(mod_version))
 );
+
+export const is_icon_error: Writable<boolean> = writable(false);
+icons.subscribe((icons) => {
+	if (icons && icons[0]) {
+		const img = new Image();
+		const iconUrl = URL.createObjectURL(icons[0]);
+		img.onload = () => {
+			is_icon_error.set(img.width !== img.height);
+		};
+		img.src = iconUrl;
+	} else {
+		is_icon_error.set(false);
+	}
+});
 
 export const is_author_error: Writable<boolean> = writable(false);
 author.subscribe((author) =>

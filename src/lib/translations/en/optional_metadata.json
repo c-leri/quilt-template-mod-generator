@@ -2,7 +2,8 @@
 	"title": "Optional Metadata",
 	"icon": {
 		"label": "Icon",
-		"call_to_action": "Choose a file..."
+		"call_to_action": "Upload a file",
+		"error": "The icon must be square"
 	},
 	"author": {
 		"label": "Author",
@@ -12,7 +13,7 @@
 	"description": {
 		"label": "Description",
 		"placeholder": "A short description of your mod.",
-		"error": "Your mod's description cannot contain the following characters: `{{placeholder}}`"
+		"error": "The mod's description cannot contain the following characters: `{{placeholder}}`"
 	},
 	"license": {
 		"label": "License",
@@ -21,16 +22,16 @@
 	"homepage_url": {
 		"label": "Homepage URL",
 		"placeholder": "https://example.com",
-		"error": "Your mod's homepage url must match the following pattern: `{{placeholder}}`"
+		"error": "The mod's homepage url must match the following pattern: `{{placeholder}}`"
 	},
 	"source_url": {
 		"label": "Source Repository URL",
 		"placeholder": "https://github.com/your-name/example-mod",
-		"error": "Your mod's source repository url must match the following pattern: `{{placeholder}}`"
+		"error": "The mod's source repository url must match the following pattern: `{{placeholder}}`"
 	},
 	"issues_url": {
 		"label": "Issue Tracker URL",
 		"placeholder": "https://github.com/your-name/example-mod/issues",
-		"error": "Your mod's issue tracker url must match the following pattern: `{{placeholder}}`"
+		"error": "The mod's issue tracker url must match the following pattern: `{{placeholder}}`"
 	}
 }
