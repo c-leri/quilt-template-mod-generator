@@ -6,7 +6,7 @@
 		MOD_ID_VALID_CHARACTERS,
 		MOD_VERSION_VALID_CHARACTERS,
 		URL_PATTERN
-	} from '$lib/constants/field_validators';
+	} from '$lib/constants/regex';
 	import CheckboxField from '$lib/components/CheckboxField.svelte';
 	import SelectField from '$lib/components/SelectField.svelte';
 	import TextAreaField from '$lib/components/TextAreaField.svelte';
@@ -30,7 +30,9 @@
 		qsl_qfapi_version,
 		mod_environment,
 		use_mixins,
-		license
+		license,
+		use_qkl,
+		qkl_version
 	} from '$lib/stores/field_values';
 	import {
 		is_mod_name_error,
@@ -46,7 +48,8 @@
 		is_quilt_loader_version_error,
 		is_quilt_mappings_version_error,
 		is_qsl_qfapi_version_error,
-		is_icon_error
+		is_icon_error,
+		is_qkl_version_error
 	} from '$lib/stores/field_errors';
 	import { licenses, mod_environments } from '$lib/constants/select_options';
 	import { generate_template } from '$lib/generate_template';
@@ -54,6 +57,7 @@
 	import IconInputField from '$lib/components/IconInputField.svelte';
 	import {
 		minecraft_versions,
+		qkl_versions,
 		qsl_qfapi_versions,
 		quilt_loader_versions,
 		quilt_mappings_versions
@@ -70,6 +74,7 @@
 		!$quilt_loader_version ||
 		!$quilt_mappings_version ||
 		($use_qsl_qfapi && !$qsl_qfapi_version) ||
+		($use_qkl && !$qkl_version) ||
 		$is_icon_error ||
 		$is_author_error ||
 		$is_description_error ||
@@ -262,6 +267,32 @@
 						  )}
 				{/if}
 			</SelectField>
+
+			<CheckboxField label={$t('dependencies_configuration.use_qkl.label')} checked={use_qkl} />
+
+			{#if $use_qkl}
+				<SelectField
+					label={$t('dependencies_configuration.qkl_version.label')}
+					options={qkl_versions}
+					value={qkl_version}
+					error={is_qkl_version_error}
+					required
+				>
+					{#if $is_qkl_version_error}
+						{$minecraft_version
+							? $t('dependencies_configuration.qkl_version.error.with_minecraft_version', {
+									placeholder: $minecraft_version
+							  })
+							: $t('dependencies_configuration.qkl_version.error.without_minecraft_version')}
+					{:else if !$qkl_versions?.length}
+						{$minecraft_version
+							? $t('dependencies_configuration.qkl_version.no_versions.with_minecraft_version', {
+									placeholder: $minecraft_version
+							  })
+							: $t('dependencies_configuration.qkl_version.no_versions.without_minecraft_version')}
+					{/if}
+				</SelectField>
+			{/if}
 		{/if}
 
 		<CheckboxField label={$t('dependencies_configuration.use_mixins.label')} checked={use_mixins} />

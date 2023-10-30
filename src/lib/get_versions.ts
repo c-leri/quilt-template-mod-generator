@@ -8,6 +8,7 @@ import type {
 	ModrinthProjectVersion
 } from './types';
 import { is_minecraft_stable, minecraft_version } from './stores/field_values';
+import { QKL_VERSION_VALIDATOR } from './constants/regex';
 
 const QUILT_META = 'https://meta.quiltmc.org/v3/versions';
 const MODRINTH_API = 'https://api.modrinth.com/v2';
@@ -125,8 +126,48 @@ export async function get_qsl_qfapi_versions(): Promise<SelectOption[]> {
 		.filter((version) => version.game_versions.includes(get(minecraft_version)))
 		.map((version) => {
 			return {
-				name: version.name.replace(`[${get(minecraft_version)}] `, ''),
+				name: version.name.replace(/\[.+\] /, ''),
 				value: version.version_number
+			};
+		});
+}
+
+/**
+ * @throws {Error}
+ */
+export async function get_qkl_versions(): Promise<SelectOption[]> {
+	if (!get(minecraft_version)) {
+		throw new Error("Can't fetch QKL vesions without a minecraft version");
+	}
+
+	const project_id = 'lwVhp9o5';
+	const url = `${MODRINTH_API}/project/${project_id}/version`;
+	const response = await fetch(url, {
+		method: 'GET',
+		headers: {
+			Accept: 'application/json'
+		}
+	});
+
+	if (!response.ok) {
+		throw new Error('Got invalid response when fetching QKL versions');
+	}
+
+	const response_body: ModrinthProjectVersion[] = await response.json();
+
+	return response_body
+		.filter(
+			(version) =>
+				version.game_versions.includes(get(minecraft_version)) && version.version_type !== 'alpha'
+		)
+		.map((version) => {
+			const version_number = version.version_number.match(QKL_VERSION_VALIDATOR)
+				? version.version_number
+				: version.name;
+
+			return {
+				name: version.name.replace(/\.$/, ''),
+				value: version_number.replace(/\.$/, '')
 			};
 		});
 }

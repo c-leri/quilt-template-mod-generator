@@ -14,3 +14,6 @@ export const MOD_VERSION_VALIDATOR = new RegExp(`[^${MOD_VERSION_VALID_CHARACTER
 
 export const URL_PATTERN = '<http OR https>://<DOMAIN>/<PATH>';
 export const URL_VALIDATOR = /https?:\/\/[a-z0-9+-.](\/[[a-z0-9+-])*/i;
+
+export const QKL_VERSION_VALIDATOR = /.+\+kt.+\+flk.+/;
+export const KOTLIN_VERSION_EXTRACTOR = /\+kt\.(.+)\+/;

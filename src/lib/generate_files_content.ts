@@ -7,6 +7,7 @@ import {
 	homepage_url,
 	icons,
 	issues_url,
+	kotlin_version,
 	license,
 	minecraft_version,
 	mod_environment,
@@ -14,11 +15,13 @@ import {
 	mod_java_class,
 	mod_name,
 	mod_version,
+	qkl_version,
 	qsl_qfapi_version,
 	quilt_loader_version,
 	quilt_mappings_version,
 	source_url,
 	use_mixins,
+	use_qkl,
 	use_qsl_qfapi
 } from './stores/field_values';
 
@@ -137,12 +140,42 @@ publishing {
 }
 
 /**
+ * @returns the content of the settings.gradle.kts file
+ */
+export function generate_settings_gradle_kts(): string {
+	return `pluginManagement {
+	repositories {
+		maven {
+			name = "Quilt"
+			url = uri("https://maven.quiltmc.org/repository/release")
+		}
+		// Currently needed for Intermediary and other temporary dependencies
+		maven {
+			name = "Fabric"
+			url = uri("https://maven.fabricmc.net/")
+		}
+
+		gradlePluginPortal()
+		mavenCentral()
+	}
+}
+
+rootProject.name = "${get(mod_id)}"
+`;
+}
+
+/**
  * @returns the content of the gradle.properties file
  */
 export function generate_gradle_properties(): string {
+	const kotlin = get(use_qkl)
+		? `\nkotlin.incremental=true
+kotlin.code.style=official`
+		: '';
+
 	return `# Gradle Properties
-org.gradle.jvmargs = -Xmx1G
-org.gradle.parallel = true
+org.gradle.jvmargs = -Xmx1G -XX:MaxMetaspaceSize=1G
+org.gradle.parallel = true${kotlin}
 
 # Mod Properties
 version = ${get(mod_version)}
@@ -167,8 +200,13 @@ This template was generated using c-leri's [Quilt Template Mod Generator](https:
  * @returns the content of the libs.versions.toml file
  */
 export function generate_libs_versions_toml(): string {
-	const qfapi_version = get(use_qsl_qfapi)
+	const qfapi_version_declaration = get(use_qsl_qfapi)
 		? `\n\nquilted_fabric_api = "${get(qsl_qfapi_version)}"`
+		: '';
+
+	const qkl_version_declaration = get(use_qkl)
+		? `\n\nkotlin = "${get(kotlin_version)}"
+quilt_kotlin_libraries = "${get(qkl_version)}"`
 		: '';
 
 	const qfapi_lib = get(use_qsl_qfapi)
@@ -176,26 +214,34 @@ export function generate_libs_versions_toml(): string {
 quilted_fabric_api_deprecated = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api-deprecated", version.ref = "quilted_fabric_api" }`
 		: '';
 
+	const qkl_lib = get(use_qkl)
+		? '\n\nquilt_kotlin_libraries = { module = "org.quiltmc.quilt-kotlin-libraries:quilt-kotlin-libraries", version.ref = "quilt_kotlin_libraries" }'
+		: '';
+
 	const bundle_example = get(use_qsl_qfapi)
 		? 'quilted_fabric_api = ["quilted_fabric_api", "quilted_fabric_api_deprecated"]'
 		: '# example = ["example-a", "example-b", "example-c"]';
+
+	const kotlin_plugin = get(use_qkl)
+		? '\nkotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }'
+		: '';
 
 	return `[versions]
 # The latest versions are available at https://lambdaurora.dev/tools/import_quilt.html
 minecraft = "${get(minecraft_version)}"
 quilt_mappings = "${get(quilt_mappings_version)}"
-quilt_loader = "${get(quilt_loader_version)}"${qfapi_version}
+quilt_loader = "${get(quilt_loader_version)}"${qfapi_version_declaration}${qkl_version_declaration}
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
 quilt_mappings = { module = "org.quiltmc:quilt-mappings", version.ref = "quilt_mappings" }
-quilt_loader = { module = "org.quiltmc:quilt-loader", version.ref = "quilt_loader" }${qfapi_lib}
+quilt_loader = { module = "org.quiltmc:quilt-loader", version.ref = "quilt_loader" }${qfapi_lib}${qkl_lib}
 
 # If you have multiple similar dependencies, you can declare a dependency bundle and reference it on the build script with "libs.bundles.example".
 [bundles]
 ${bundle_example}
 
-[plugins]
+[plugins]${kotlin_plugin}
 quilt_loom = { id = "org.quiltmc.loom", version = "1.4.1" }
 `;
 }
@@ -296,6 +342,81 @@ ${logger_declaration}${initializer_override}}
 }
 
 /**
+ * @returns the content of the main java class
+ */
+export function generate_kotlin_main(): string {
+	const initializer_import = get(use_qsl_qfapi)
+		? `import org.quiltmc.loader.api.ModContainer
+import org.quiltmc.qsl.base.api.entrypoint.ModInitializer\n`
+		: '';
+
+	const initializer_implement = get(use_qsl_qfapi) ? ': ModInitializer ' : '';
+
+	const initializer_override = get(use_qsl_qfapi)
+		? `\n\n\toverride fun onInitialize(mod: ModContainer) {
+\t\tLOGGER.info("Hello Quilt world from {}!", mod.metadata()?.name())
+\t}`
+		: '';
+
+	return `package ${get(group_id)}.${get(mod_id)};
+
+${initializer_import}import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+object ${get(mod_java_class)} ${initializer_implement}{
+\t// This logger is used to write text to the console and the log file.
+\t// It is considered best practice to use your mod name as the logger's name.
+\t// That way, it's clear which mod wrote info, warnings, and errors.
+\tval LOGGER: Logger = LoggerFactory.getLogger("${get(mod_name)}")${initializer_override}
+}
+`;
+}
+
+/**
+ * @returns the content of the client java class
+ */
+export function generate_kotlin_client(): string {
+	const initializer_import = get(use_qsl_qfapi)
+		? `\nimport org.quiltmc.loader.api.ModContainer
+import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer${
+				get(mod_environment) !== 'client' ? '\n' : ''
+		  }`
+		: '';
+
+	const logger_import =
+		get(mod_environment) === 'client'
+			? '\nimport org.slf4j.Logger\nimport org.slf4j.LoggerFactory\n'
+			: '';
+
+	const initializer_implement = get(use_qsl_qfapi) ? ': ClientModInitializer ' : '';
+
+	const logger_declaration =
+		get(mod_environment) === 'client'
+			? `\t// This logger is used to write text to the console and the log file.
+\t// It is considered best practice to use your mod name as the logger's name.
+\t// That way, it's clear which mod wrote info, warnings, and errors.
+\tval LOGGER: Logger = LoggerFactory.getLogger("${get(mod_name)}")\n${
+					get(use_qsl_qfapi) ? '\n' : ''
+			  }`
+			: '';
+
+	const initializer_override = get(use_qsl_qfapi)
+		? `\toverride fun onInitializeClient(mod: ModContainer) {${
+				get(mod_environment) === 'client'
+					? '\n\t\tLOGGER.info("Hello Quilt world from {}!", mod.metadata()?.name())'
+					: ''
+		  }
+\t}\n`
+		: '';
+
+	return `package ${get(group_id)}.${get(mod_id)}.client
+${initializer_import}${logger_import}
+object ${get(mod_java_class)}Client ${initializer_implement}{
+${logger_declaration}${initializer_override}}
+`;
+}
+
+/**
  * @returns the content of the mixin example java class
  */
 export function generate_java_mixin(): string {
@@ -320,9 +441,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ${get(mod_environment) === 'server' ? 'MinecraftServer' : 'TitleScreen'}Mixin {
 \t@Inject(method = "${get(mod_environment) === 'server' ? 'loadWorld' : 'init'}", at = @At("TAIL"))
 \tpublic void onInit(CallbackInfo ci) {
-\t\t${
-		get(mod_environment) === 'client' ? get(mod_java_class) + 'Client' : get(mod_java_class)
-	}.LOGGER.info("This line is printed by a mixin of ${get(mod_name)}!");
+\t\t${get(mod_environment) === 'client' ? get(mod_java_class) + 'Client' : get(mod_java_class)}.${
+		get(use_qkl) ? 'INSTANCE.getLOGGER()' : 'LOGGER'
+	}.info("This line is printed by a mixin of ${get(mod_name)}!");
 \t}
 }
 `;
@@ -369,7 +490,34 @@ export function generate_quilt_mod_json(): string {
 		get(icons) && get(icons)[0] ? `,\n\t\t\t"icon": "assets/${get(mod_id)}/icon.png"` : '';
 
 	let entrypoints_content = '';
-	if (get(use_qsl_qfapi)) {
+	if (get(use_qkl)) {
+		entrypoints_content = '\n\t\t"entrypoints": {\n';
+		switch (get(mod_environment)) {
+			case 'client':
+				entrypoints_content += `\t\t\t"client_init": {
+\t\t\t\t"adapter": "kotlin",
+\t\t\t\t"value": "${get(group_id)}.${get(mod_id)}.client.${get(mod_java_class)}Client"
+\t\t\t}\n`;
+				break;
+			case 'both':
+				entrypoints_content += `\t\t\t"init": {
+\t\t\t\t"adapter": "kotlin",
+\t\t\t\t"value": "${get(group_id)}.${get(mod_id)}.${get(mod_java_class)}"
+\t\t\t},
+\t\t\t"client_init": {
+\t\t\t\t"adapter": "kotlin",
+\t\t\t\t"value": "${get(group_id)}.${get(mod_id)}.client.${get(mod_java_class)}Client"
+\t\t\t}\n`;
+				break;
+			case 'server':
+				entrypoints_content += `\t\t\t"init": {
+\t\t\t\t"adapter": "kotlin",
+\t\t\t\t"value": "${get(group_id)}.${get(mod_id)}.${get(mod_java_class)}"
+\t\t\t}\n`;
+				break;
+		}
+		entrypoints_content += '\t\t},';
+	} else if (get(use_qsl_qfapi)) {
 		entrypoints_content = '\n\t\t"entrypoints": {\n';
 		switch (get(mod_environment)) {
 			case 'client':
@@ -395,7 +543,14 @@ export function generate_quilt_mod_json(): string {
 	const qfapi_content = get(use_qsl_qfapi)
 		? `\n\t\t\t{
 \t\t\t\t"id": "quilted_fabric_api",
-\t\t\t\t"versions": ">=${get(qsl_qfapi_version).replace(/-.+/g, '-')}"
+\t\t\t\t"versions": ">=${get(qsl_qfapi_version).replace(/-.+/, '-')}"
+\t\t\t},`
+		: '';
+
+	const qkl_content = get(use_qkl)
+		? `\n\t\t\t{
+\t\t\t\t"id": "qkl",
+\t\t\t\t"versions": ">=${get(qkl_version).replace(/\+.+/, '')}"
 \t\t\t},`
 		: '';
 
@@ -417,7 +572,7 @@ export function generate_quilt_mod_json(): string {
 \t\t\t{
 \t\t\t\t"id": "quilt_loader",
 \t\t\t\t"versions": ">=${get(quilt_loader_version).replace(/-.+/g, '-')}"
-\t\t\t},${qfapi_content}
+\t\t\t},${qfapi_content}${qkl_content}
 \t\t\t{
 \t\t\t\t"id": "minecraft",
 \t\t\t\t"versions": "~${get(minecraft_version)}"

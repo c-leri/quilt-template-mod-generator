@@ -17,12 +17,13 @@ import {
 	MOD_ID_VALIDATOR,
 	MOD_VERSION_VALIDATOR,
 	URL_VALIDATOR
-} from '$lib/constants/field_validators';
+} from '$lib/constants/regex';
 
 export const is_minecraft_version_error: Writable<boolean> = writable(false);
 export const is_quilt_loader_version_error: Writable<boolean> = writable(false);
 export const is_quilt_mappings_version_error: Writable<boolean> = writable(false);
 export const is_qsl_qfapi_version_error: Writable<boolean> = writable(false);
+export const is_qkl_version_error: Writable<boolean> = writable(false);
 
 export const is_mod_name_error: Writable<boolean> = writable(false);
 mod_name.subscribe((mod_name) =>

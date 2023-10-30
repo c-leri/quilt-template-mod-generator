@@ -1,3 +1,4 @@
+import { KOTLIN_VERSION_EXTRACTOR } from '$lib/constants/regex';
 import type { License, ModEnvironment } from '$lib/types';
 import { derived, writable, type Readable, type Writable } from 'svelte/store';
 
@@ -15,6 +16,12 @@ export const quilt_loader_version: Writable<string> = writable();
 export const quilt_mappings_version: Writable<string> = writable();
 export const use_qsl_qfapi: Writable<boolean> = writable(true);
 export const qsl_qfapi_version: Writable<string> = writable();
+export const use_qkl: Writable<boolean> = writable(false);
+export const qkl_version: Writable<string> = writable();
+export const kotlin_version: Readable<string | undefined> = derived(
+	qkl_version,
+	($qkl_version) => KOTLIN_VERSION_EXTRACTOR.exec($qkl_version)?.[1] || undefined
+);
 export const use_mixins: Writable<boolean> = writable(true);
 export const icons: Writable<File[]> = writable();
 export const author: Writable<string> = writable();

@@ -43,6 +43,20 @@
 			"without_minecraft_version": "Aucune version de QSL/QFAPI n'a été trouvée pour cette version de Minecraft"
 		}
 	},
+	"use_qkl": {
+		"label": "Utiliser Kotlin"
+	},
+	"qkl_version": {
+		"label": "Version des Quilt Kotlin Libraries",
+		"error": {
+			"with_minecraft_version": "Impossible de récupérer les versions des QKL pour Minecraft version {{placeholder}}",
+			"without_minecraft_version": "Impossible de récupérer les versions des QKL pour cette version de Minecraft"
+		},
+		"no_versions": {
+			"with_minecraft_version": "Aucune version des QKL n'a été trouvée pour Minecraft version {{placeholder}}",
+			"without_minecraft_version": "Aucune version des QKL n'a été trouvée pour cette version de Minecraft"
+		}
+	},
 	"use_mixins": {
 		"label": "Utiliser des Mixins ?"
 	}

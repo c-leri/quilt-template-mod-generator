@@ -22,6 +22,7 @@ export interface QuiltMappingsVersion {
 export interface ModrinthProjectVersion {
 	name: string;
 	version_number: string;
+	version_type: 'release' | 'beta' | 'alpha';
 	game_versions: string[];
 }
 
@@ -48,4 +49,5 @@ export type StaticTextFiles =
 	| '.gitignore'
 	| 'gradlew.bat'
 	| 'gradlew'
-	| 'settings.gradle';
+	| 'settings.gradle'
+	| 'build.gradle.kts';
