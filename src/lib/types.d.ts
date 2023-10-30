@@ -19,6 +19,12 @@ export interface QuiltMappingsVersion {
 	version: string;
 }
 
+export interface ModrinthProjectVersion {
+	name: string;
+	version_number: string;
+	game_versions: string[];
+}
+
 export interface GradleVersion {
 	version: string;
 }

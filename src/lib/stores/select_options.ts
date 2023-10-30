@@ -53,6 +53,9 @@ minecraft_version.subscribe(($minecraft_version) => {
 				is_qsl_qfapi_version_error.set(false);
 				qsl_qfapi_versions.set($qsl_qfapi_versions);
 			})
-			.catch(() => is_qsl_qfapi_version_error.set(true));
+			.catch((err) => {
+				console.error(err);
+				is_qsl_qfapi_version_error.set(true);
+			});
 	}
 });
