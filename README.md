@@ -18,3 +18,8 @@ Clone the project and run `pnpm install` to install dependencies then `pnpm dev`
 - Provide a translation for each key in each of the `*.json` files in the new folder
 - Add an entry for the added language in /src/lib/translations/lang.json
 - Add the newly added language to the `translations` field of the config in /src/lib/translations/index.ts
+
+# Contributions
+
+- General idea and inspiration for the project : [Jaffe2718's Quilt Template Mod Generator](https://github.com/Jaffe2718/quilt-template-mod-generator)
+- Base for the Svelte rewrite : [Quilt Developer Wiki](https://github.com/QuiltMC/developer-wiki)
