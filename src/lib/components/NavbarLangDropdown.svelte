@@ -21,6 +21,20 @@
 		is_dropdown_active = !is_dropdown_active;
 	}
 
+	let dropdown_toggle: HTMLDivElement;
+	function handleBlur(event: FocusEvent) {
+		// Check that the newly focused element is not a child
+		// of the dropdown toggle element so that users
+		// can actually select a locale
+		if (
+			!event.relatedTarget ||
+			!(event.relatedTarget instanceof Node) ||
+			!dropdown_toggle.contains(event.relatedTarget)
+		) {
+			is_dropdown_active = false;
+		}
+	}
+
 	const selectLocale = (selected_locale: string) => {
 		$locale = selected_locale;
 	};
@@ -29,19 +43,13 @@
 <div
 	class="navbar-item has-dropdown {is_dropdown_active ? 'is-active' : ''}"
 	on:click={toggleNavbar}
-	on:keypress={toggleNavbar}
-	on:blur={(event) => {
-		// Check that the newly focused element is not a child
-		// of this element so that users can actually select
-		// a locale
-		if (
-			!event.relatedTarget ||
-			!(event.relatedTarget instanceof Node) ||
-			!event.currentTarget.contains(event.relatedTarget)
-		) {
-			is_dropdown_active = false;
+	on:keypress={(event) => {
+		if (event.key === 'Enter') {
+			toggleNavbar();
 		}
 	}}
+	on:blur={handleBlur}
+	bind:this={dropdown_toggle}
 	role="button"
 	tabindex="0"
 >
@@ -55,7 +63,12 @@
 			<span
 				class="navbar-item is-clickable"
 				on:click={() => selectLocale(locale)}
-				on:keypress={() => selectLocale(locale)}
+				on:keypress={(event) => {
+					if (event.key === 'Enter') {
+						selectLocale(locale);
+					}
+				}}
+				on:blur={handleBlur}
 				role="button"
 				tabindex="0"
 			>
