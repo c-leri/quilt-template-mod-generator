@@ -1,5 +1,8 @@
 {
 	"title": "Quilt Template Mod Generator",
 	"title.short": "Template Generator",
-	"generate_template_button": "Generate Template"
+	"generate_template_button": "Generate Template",
+	"lang-dropdown": {
+		"language": "Language"
+	}
 }

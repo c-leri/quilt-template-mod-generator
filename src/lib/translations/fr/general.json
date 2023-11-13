@@ -1,5 +1,8 @@
 {
 	"title": "Générateur de Mod Patron pour Quilt",
 	"title.short": "Générateur de Patron",
-	"generate_template_button": "Générer le Patron"
+	"generate_template_button": "Générer le Patron",
+	"lang-dropdown": {
+		"language": "Langue"
+	}
 }
