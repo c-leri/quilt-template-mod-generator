@@ -39,7 +39,7 @@
 				class="navbar-item has-icon"
 				target="_blank"
 			>
-				<span class="icon"><i class="fas fa-bug fa-xl" /></span>
+				<span class="icon"><div class="i-fa6-solid-bug i-xl" /></span>
 				<span class="is-hidden-desktop">Issues</span>
 			</a>
 			<a
@@ -47,7 +47,7 @@
 				class="navbar-item has-icon"
 				target="_blank"
 			>
-				<span class="icon"><i class="fab fa-github fa-xl" /></span>
+				<span class="icon"><div class="i-fa6-brands-github i-xl" /></span>
 				<span class="is-hidden-desktop">Source</span>
 			</a>
 		</div>

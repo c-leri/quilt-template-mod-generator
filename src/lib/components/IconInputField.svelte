@@ -28,7 +28,7 @@
 				/>
 				<span class="file-cta">
 					<span class="file-icon">
-						<i class="fas fa-upload" />
+						<div class="i-fa6-solid-upload" />
 					</span>
 					<span class="file-label">{$t('optional_metadata.icon.call_to_action')}</span>
 				</span>
@@ -49,7 +49,7 @@
 				}}
 			>
 				<span class="icon">
-					<i class="fas fa-times" />
+					<div class="i-fa6-solid-times" />
 				</span>
 			</button>
 		{/if}
