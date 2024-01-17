@@ -3,7 +3,7 @@
 	"icon": {
 		"label": "Icône",
 		"call_to_action": "Téléverser un fichier",
-		"error": "L'icône doit être carrée"
+		"error": "L'icône doit être un png carré"
 	},
 	"author": {
 		"label": "Auteur",

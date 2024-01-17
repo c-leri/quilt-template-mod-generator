@@ -3,7 +3,7 @@
 	"icon": {
 		"label": "Icon",
 		"call_to_action": "Upload a file",
-		"error": "The icon must be square"
+		"error": "The icon must be square png"
 	},
 	"author": {
 		"label": "Author",

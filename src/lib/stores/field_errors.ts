@@ -48,12 +48,16 @@ mod_version.subscribe((mod_version) =>
 export const is_icon_error: Writable<boolean> = writable(false);
 icons.subscribe((icons) => {
 	if (icons && icons[0]) {
-		const img = new Image();
-		const iconUrl = URL.createObjectURL(icons[0]);
-		img.onload = () => {
-			is_icon_error.set(img.width !== img.height);
-		};
-		img.src = iconUrl;
+		if (icons[0].type != 'image/png') {
+			is_icon_error.set(true);
+		} else {
+			const img = new Image();
+			const iconUrl = URL.createObjectURL(icons[0]);
+			img.onload = () => {
+				is_icon_error.set(img.width !== img.height);
+			};
+			img.src = iconUrl;
+		}
 	} else {
 		is_icon_error.set(false);
 	}

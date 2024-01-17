@@ -49,7 +49,7 @@
 				}}
 			>
 				<span class="icon">
-					<div class="i-fa6-solid-times" />
+					<div class="i-fa6-solid-xmark" />
 				</span>
 			</button>
 		{/if}
