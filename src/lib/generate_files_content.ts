@@ -140,6 +140,31 @@ publishing {
 }
 
 /**
+ * @returns the content of the settings.gradle file
+ */
+export function generate_settings_gradle(): string {
+	return `pluginManagement {
+	repositories {
+		maven {
+			name = 'Quilt'
+			url = 'https://maven.quiltmc.org/repository/release'
+		}
+		// Currently needed for Intermediary and other temporary dependencies
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
+		
+		gradlePluginPortal()
+		mavenCentral()
+	}
+}
+
+rootProject.name = "${get(mod_name)}"
+`;
+}
+
+/**
  * @returns the content of the settings.gradle.kts file
  */
 export function generate_settings_gradle_kts(): string {
@@ -160,7 +185,7 @@ export function generate_settings_gradle_kts(): string {
 	}
 }
 
-rootProject.name = "${get(mod_id)}"
+rootProject.name = "${get(mod_name)}"
 `;
 }
 
@@ -169,8 +194,8 @@ rootProject.name = "${get(mod_id)}"
  */
 export function generate_gradle_properties(): string {
 	const kotlin = get(use_qkl)
-		? `\nkotlin.incremental=true
-kotlin.code.style=official`
+		? `\nkotlin.incremental = true
+kotlin.code.style = official`
 		: '';
 
 	return `# Gradle Properties
@@ -286,6 +311,8 @@ ${initializer_import}import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ${get(mod_java_class)} ${initializer_implement}{
+\tpublic static final String MOD_ID = "${get(mod_id)}";
+\t
 \t// This logger is used to write text to the console and the log file.
 \t// It is considered best practice to use your mod name as the logger's name.
 \t// That way, it's clear which mod wrote info, warnings, and errors.
@@ -314,9 +341,11 @@ import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;${
 
 	const initializer_implement = get(use_qsl_qfapi) ? 'implements ClientModInitializer ' : '';
 
-	const logger_declaration =
+	const logger_and_id_declaration =
 		get(mod_environment) === 'client'
-			? `\t// This logger is used to write text to the console and the log file.
+			? `\tpublic static final String MOD_ID = "${get(mod_id)}";
+\t
+\t// This logger is used to write text to the console and the log file.
 \t// It is considered best practice to use your mod name as the logger's name.
 \t// That way, it's clear which mod wrote info, warnings, and errors.
 \tpublic static final Logger LOGGER = LoggerFactory.getLogger("${get(mod_name)}");\n${
@@ -337,7 +366,7 @@ import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;${
 	return `package ${get(group_id)}.${get(mod_id)}.client;
 ${initializer_import}${logger_import}
 public class ${get(mod_java_class)}Client ${initializer_implement}{
-${logger_declaration}${initializer_override}}
+${logger_and_id_declaration}${initializer_override}}
 `;
 }
 
@@ -358,12 +387,14 @@ import org.quiltmc.qsl.base.api.entrypoint.ModInitializer\n`
 \t}`
 		: '';
 
-	return `package ${get(group_id)}.${get(mod_id)};
+	return `package ${get(group_id)}.${get(mod_id)}
 
 ${initializer_import}import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 object ${get(mod_java_class)} ${initializer_implement}{
+\tconst val MOD_ID: String = "${get(mod_id)}"
+\t
 \t// This logger is used to write text to the console and the log file.
 \t// It is considered best practice to use your mod name as the logger's name.
 \t// That way, it's clear which mod wrote info, warnings, and errors.
@@ -390,9 +421,11 @@ import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer${
 
 	const initializer_implement = get(use_qsl_qfapi) ? ': ClientModInitializer ' : '';
 
-	const logger_declaration =
+	const logger_and_id_declaration =
 		get(mod_environment) === 'client'
-			? `\t// This logger is used to write text to the console and the log file.
+			? `\tconst val MOD_ID: String = "${get(mod_id)}"
+\t
+\t// This logger is used to write text to the console and the log file.
 \t// It is considered best practice to use your mod name as the logger's name.
 \t// That way, it's clear which mod wrote info, warnings, and errors.
 \tval LOGGER: Logger = LoggerFactory.getLogger("${get(mod_name)}")\n${
@@ -412,7 +445,7 @@ import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer${
 	return `package ${get(group_id)}.${get(mod_id)}.client
 ${initializer_import}${logger_import}
 object ${get(mod_java_class)}Client ${initializer_implement}{
-${logger_declaration}${initializer_override}}
+${logger_and_id_declaration}${initializer_override}}
 `;
 }
 

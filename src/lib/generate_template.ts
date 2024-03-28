@@ -25,7 +25,8 @@ import {
 	generate_mixins_json,
 	generate_quilt_mod_json,
 	generate_readme_md,
-	generate_settings_gradle_kts
+	generate_settings_gradle_kts,
+	generate_settings_gradle
 } from './generate_files_content';
 import { get } from 'svelte/store';
 import type { StaticTextFiles } from './types';
@@ -71,7 +72,7 @@ export async function generate_template() {
 		root.file('settings.gradle.kts', generate_settings_gradle_kts());
 		await add_static_file_to_foler(root, 'build.gradle.kts');
 	} else {
-		await add_static_file_to_foler(root, 'settings.gradle');
+		root.file('settings.gradle', generate_settings_gradle());
 		root.file('build.gradle', generate_build_gradle());
 	}
 
