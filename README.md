@@ -1,3 +1,8 @@
+> [!WARNING]
+> **This is just a learning project!**
+> 
+> While this is functionnal I recommend you use the [official mod generator](https://quiltmc.org/usage/generator/).
+
 # Quilt Template Mod Generator
 
 A tool to generate your own Quilt Templates !
